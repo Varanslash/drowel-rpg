@@ -6,8 +6,11 @@ mod playerattackdata;
 use playerattackdata::*;
 mod monsterattackdata;
 
+const budgetforstats: u8 = 64;
+const statcap: u8 = 20;
+
 fn main() {
-    let char_points = 70;
+    let char_points = budgetforstats;
     println!("
        █▀▄▄▄█▀                                                               ▄▄▄▀▀▀█
         █   █                                                                 █   █ 
@@ -59,87 +62,87 @@ fn main() {
     
     let strength: u8 = match split_stats[0].parse() {
         Ok(val) => match val {
-            1..=20 => val,
+            1..=statcap => val,
             _ => {
-                println!("Strength must be between 1 and 20.");
+                println!("Strength must be between 1 and {}.", statcap);
                 return;
             }
         },
         Err(_) => {
-            println!("Invalid input for strength; please enter a number between 1 and 20.");
+            println!("Invalid input for strength; please enter a number between 1 and {}.", statcap);
             return;
         }
     };
     let dexterity: u8 = match split_stats[1].parse() {
         Ok(val) => match val {
-            1..=20 => val,
+            1..=statcap => val,
             _ => {
-                println!("Dexterity must be between 1 and 20.");
+                println!("Dexterity must be between 1 and {}.", statcap);
                 return;
             }
         },
         Err(_) => {
-            println!("Invalid input for dexterity; please enter a number between 1 and 20.");
+            println!("Invalid input for dexterity; please enter a number between 1 and {}.", statcap);
             return;
         }
     };
     let constitution: u8 = match split_stats[2].parse() {
         Ok(val) => match val {
-            1..=20 => val,
+            1..=statcap => val,
             _ => {
-                println!("Constitution must be between 1 and 20.");
+                println!("Constitution must be between 1 and {}.", statcap);
                 return;
             }
         },
         Err(_) => {
-            println!("Invalid input for constitution; please enter a number between 1 and 20.");
+            println!("Invalid input for constitution; please enter a number between 1 and {}.", statcap);
             return;
         }
     };
     let intelligence: u8 = match split_stats[3].parse() {
         Ok(val) => match val {
-            1..=20 => val,
+            1..=statcap => val,
             _ => {
-                println!("Intelligence must be between 1 and 20.");
+                println!("Intelligence must be between 1 and {}.", statcap);
                 return;
             }
         },
         Err(_) => {
-            println!("Invalid input for intelligence; please enter a number between 1 and 20.");
+            println!("Invalid input for intelligence; please enter a number between 1 and {}.", statcap);
             return;
         }
     };
     let wisdom: u8 = match split_stats[4].parse() {
         Ok(val) => match val {
-            1..=20 => val,
+            1..=statcap => val,
             _ => {
-                println!("Wisdom must be between 1 and 20.");
+                println!("Wisdom must be between 1 and {}.", statcap);
                 return;
             }
         },
         Err(_) => {
-            println!("Invalid input for wisdom; please enter a number between 1 and 20.");
+            println!("Invalid input for wisdom; please enter a number between 1 and {}.", statcap);
             return;
         }
     };
     let charisma: u8 = match split_stats[5].parse() {
         Ok(val) => match val {
-            1..=20 => val,
+            1..=statcap => val,
             _ => {
-                println!("Charisma must be between 1 and 20.");
+                println!("Charisma must be between 1 and {}.", statcap);
                 return;
             }
         },
         Err(_) => {
-            println!("Invalid input for charisma; please enter a number between 1 and 20.");
+            println!("Invalid input for charisma; please enter a number between 1 and {}.", statcap);
             return;
         }
     };
 
     // Ensures the player doesn't overflow their budget, they are allowed to have less than 70 though
     let point_check = strength + dexterity + constitution + intelligence + wisdom + charisma;
-    if point_check > 70 {
-        println!("Total points must be less than or equal to 70.");
+    if point_check > budgetforstats {
+        println!("Total points must be less than or equal to {}.", budgetforstats);
         return;
     }
 

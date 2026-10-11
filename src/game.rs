@@ -89,6 +89,19 @@ pub fn game(mut player: Player) {
                 std::process::exit(0);
             }
             encvaltracker = 0;
+            if player.xp >= (((2u64.pow(player.level as u32)) / 2) + 20 * (player.level as u64)) {
+                player.level += 1;
+                println!("You are now level {}!", player.level);
+                if player.level % 4 == 0 {
+                    player.strength += 1;
+                    player.dexterity += 1;
+                    player.constitution += 1;
+                    player.intelligence += 1;
+                    player.wisdom += 1;
+                    player.charisma += 1;
+                    println!("Character upgrade! +1 to every stat.")
+                }
+            }
         }
 
         // Room data usage; actually use the required room data to show the room to the player.
@@ -315,6 +328,7 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
 
     if monsterfightdata.hp < 0 {
         playerfightdata.xp += monsterfightdata.xp;
+        println!("You win! Gain {} xp.", monsterfightdata.xp);
     }
 
     return playerfightdata;
