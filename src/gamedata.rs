@@ -54,6 +54,11 @@ pub enum Class {
     Druid
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Copy)]
+pub enum Area {
+    Forest,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Room {
     pub description: String,
@@ -62,5 +67,6 @@ pub struct Room {
     pub east: u32,
     pub west: u32,
     pub monster: MonsterList,
+    pub area: Area,
     pub encval: u32 // Every room has a set value in which encounters are triggered; 0 is guaranteed encounter, and a sufficiently high number is no encounter.
 }

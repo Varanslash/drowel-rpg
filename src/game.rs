@@ -16,6 +16,7 @@ pub fn game(mut player: Player) {
             east: 0,
             west: 0,
             monster: MonsterList::Goblin,
+            area: Area::Forest,
             encval: 20
         }),
         (2, Room {
@@ -25,6 +26,7 @@ pub fn game(mut player: Player) {
             east: 0,
             west: 0,
             monster: MonsterList::Orc,
+            area: Area::Forest,
             encval: 20
         }),
         (3, Room {
@@ -34,6 +36,7 @@ pub fn game(mut player: Player) {
             east: 0,
             west: 0,
             monster: MonsterList::Goblin,
+            area: Area::Forest,
             encval: 20
         }),
     ]);
@@ -74,10 +77,18 @@ pub fn game(mut player: Player) {
         }),
     ]);
 
+    let maps: HashMap<Area, String> = HashMap::from([
+        (Area::Forest,
+        "
+[2 ]
+[1 ]
+[3 ]".to_string())
+    ]);
+
     // Game Data Initialization
     let mut room = 1;
     let mut encvaltracker = 0; // This tracks a mod 4 value as a pseudo-random number generator for monster encounters, since I'm too lazy for crates
-    let commandlist = vec!["north", "south", "east", "west", "help", "?", "n", "s", "e", "w", "help verbose", "hv"]; // List of valid commands for internal use
+    let commandlist = vec!["north", "south", "east", "west", "help", "?", "n", "s", "e", "w", "help verbose", "hv", "map", "m"]; // List of valid commands for internal use
 
 
     while room != 0 && room != 3900000 { // 0 = invalid room; 3900000 = credits (the final boss's room is 3899999, one step before)
@@ -114,7 +125,7 @@ pub fn game(mut player: Player) {
         match input.trim().to_lowercase().as_str() {
             cmd if commandlist.contains(&cmd) => {
                 // This launches movement function such that we can get the value for the next room
-                let new_room = movement(room, roomdata.north, roomdata.south, roomdata.east, roomdata.west, cmd.to_string());
+                let new_room = movement(room, roomdata.north, roomdata.south, roomdata.east, roomdata.west, cmd.to_string(), &maps, roomdata.area);
                 if new_room != room {
                     room = new_room;
                     encvaltracker += new_room % 4; // Adds a value mod 4 to the encval tracker, so values of only -1<n<4 are added for seeming randomness
@@ -128,14 +139,14 @@ pub fn game(mut player: Player) {
     }
 }
 
-pub fn movement(room: u32, north: u32, south: u32, east: u32, west: u32, direction: String) -> u32 {
+pub fn movement(room: u32, north: u32, south: u32, east: u32, west: u32, direction: String, maps: &HashMap<Area, String>, area: Area) -> u32 {
     let dest = match direction.to_lowercase().as_str() {
         "west" | "w" => west,
         "east" | "e" => east,
         "south" | "s" => south,
         "north" | "n" => north,
         "help" | "?" => {
-            println!("Available commands: north (n), south (s), east (e), west (w), help (?)");
+            println!("Available commands: north (n), south (s), east (e), west (w), help (?), help verbose (hv), map (m)");
             println!("You can type \"help verbose\" (hv) to get a more detailed description of available actions.");
             return room;
         }
@@ -147,12 +158,18 @@ pub fn movement(room: u32, north: u32, south: u32, east: u32, west: u32, directi
             println!("\"south\" (s) - Moves south if available.");
             println!("\"help\" (?) - Displays a simple list of commands.");
             println!("\"help verbose\" (hv) - Displays this list.");
+            println!("\"map\" (m) - Displays an indexed map of the current area.");
             println!("---ATTACK COMMANDS---");
             println!("\"attack\" (a) - Attacks any one of four attacks based on player choice.");
             println!("\"run\" (r) - Runs from battle. If a monster outcompetes you on 2/3 physical stats, then the run fails and the monster gets a free turn.");
             println!("\"help\" (?) - Displays a simple list of attack commands.");
             println!("\"stat\" (s) - Displays player and monster stats.");
             println!("------END------");
+            return room;
+        }
+        "map" | "m" => {
+            let map = maps.get(&area).unwrap();
+            println!("{}", map);
             return room;
         }
         _ => {
