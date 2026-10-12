@@ -5,11 +5,21 @@ use gamedata::{Player, Class};
 mod playerattackdata;
 use playerattackdata::*;
 mod monsterattackdata;
+use std::collections::HashMap;
 
 const budgetforstats: u8 = 64;
 const statcap: u8 = 20;
 
 fn main() {
+    let attacklist: HashMap<Class, [fn(&Player) -> i32; 4]> = HashMap::from([
+        (Class::Wizard, [nanattack as fn(&Player) -> i32, nanattack, nanattack, nanattack]),
+        (Class::Fighter, [nanattack, nanattack, nanattack, nanattack]),
+        (Class::Bishop, [nanattack, nanattack, nanattack, nanattack]),
+        (Class::Druid, [nanattack, nanattack, nanattack, nanattack]),
+        (Class::Paladin, [nanattack, nanattack, nanattack, nanattack]),
+        (Class::Barbarian, [nanattack, nanattack, nanattack, nanattack]),
+        (Class::Bard, [nanattack, nanattack, nanattack, nanattack]),
+    ]);
     let char_points = budgetforstats;
     println!("
        █▀▄▄▄█▀                                                               ▄▄▄▀▀▀█
@@ -146,6 +156,8 @@ fn main() {
         return;
     }
 
+    let attackformulas = attacklist.get(&class).unwrap();
+
     let player = Player {
         strength: strength,
         dexterity: dexterity,
@@ -157,10 +169,10 @@ fn main() {
         name: name.trim().to_string(),
         hp: 40,
         class: class,
-        attack_formula: nanattack,
-        attack_formula_2: nanattack,
-        attack_formula_3: nanattack,
-        attack_formula_4: nanattack,
+        attack_formula: attackformulas[0],
+        attack_formula_2: attackformulas[1],
+        attack_formula_3: attackformulas[2],
+        attack_formula_4: attackformulas[3],
         xp: 0,
     };
 
