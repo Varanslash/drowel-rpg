@@ -1,6 +1,6 @@
 use crate::gamedata;
-use gamedata::Player;
+use gamedata::*;
 
-pub fn nanattack(stat: &Player) -> i32 {
-    return 1;
+pub fn nanattack(stat: &Player) -> (i32, Status) {
+    return (1, Status::None);
 }

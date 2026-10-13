@@ -1,18 +1,21 @@
 mod game;
-use game::game;
 mod gamedata;
-use gamedata::{Player, Class};
 mod playerattackdata;
-use playerattackdata::*;
 mod monsterattackdata;
+mod encounter;
+mod world;
+use game::game;
+use gamedata::*;
+use playerattackdata::*;
 use std::collections::HashMap;
+use world::init;
 
-const budgetforstats: u8 = 64;
-const statcap: u8 = 20;
+const budgetforstats: i32 = 64;
+const statcap: i32 = 20;
 
 fn main() {
-    let attacklist: HashMap<Class, [fn(&Player) -> i32; 4]> = HashMap::from([
-        (Class::Wizard, [nanattack as fn(&Player) -> i32, nanattack, nanattack, nanattack]),
+    let attacklist: HashMap<Class, [fn(&Player) -> (i32, Status); 4]> = HashMap::from([
+        (Class::Wizard, [nanattack as fn(&Player) -> (i32, Status), nanattack, nanattack, nanattack]),
         (Class::Fighter, [nanattack, nanattack, nanattack, nanattack]),
         (Class::Bishop, [nanattack, nanattack, nanattack, nanattack]),
         (Class::Druid, [nanattack, nanattack, nanattack, nanattack]),
@@ -70,7 +73,7 @@ fn main() {
     }
 
     
-    let strength: u8 = match split_stats[0].parse() {
+    let strength: i32 = match split_stats[0].parse() {
         Ok(val) => match val {
             1..=statcap => val,
             _ => {
@@ -83,7 +86,7 @@ fn main() {
             return;
         }
     };
-    let dexterity: u8 = match split_stats[1].parse() {
+    let dexterity: i32 = match split_stats[1].parse() {
         Ok(val) => match val {
             1..=statcap => val,
             _ => {
@@ -96,7 +99,7 @@ fn main() {
             return;
         }
     };
-    let constitution: u8 = match split_stats[2].parse() {
+    let constitution: i32 = match split_stats[2].parse() {
         Ok(val) => match val {
             1..=statcap => val,
             _ => {
@@ -109,7 +112,7 @@ fn main() {
             return;
         }
     };
-    let intelligence: u8 = match split_stats[3].parse() {
+    let intelligence: i32 = match split_stats[3].parse() {
         Ok(val) => match val {
             1..=statcap => val,
             _ => {
@@ -122,7 +125,7 @@ fn main() {
             return;
         }
     };
-    let wisdom: u8 = match split_stats[4].parse() {
+    let wisdom: i32 = match split_stats[4].parse() {
         Ok(val) => match val {
             1..=statcap => val,
             _ => {
@@ -135,7 +138,7 @@ fn main() {
             return;
         }
     };
-    let charisma: u8 = match split_stats[5].parse() {
+    let charisma: i32 = match split_stats[5].parse() {
         Ok(val) => match val {
             1..=statcap => val,
             _ => {
@@ -174,7 +177,12 @@ fn main() {
         attack_formula_3: attackformulas[2],
         attack_formula_4: attackformulas[3],
         xp: 0,
+        items: Vec::new(),
+        status: Status::None,
+        passive: Passive::None,
+        money: 0
     };
 
-    game(player);
+    let world = init();
+    game(player, world.0, world.1, world.2);
 }
