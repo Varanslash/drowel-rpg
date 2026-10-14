@@ -77,6 +77,10 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
                                     println!("{} did {} damage to {}!", playerfightdata.name, dmg.0, monsterfightdata.name);
                                     monsterfightdata.hp -= dmg.0;
                                     println!("{} has {} HP left!", monsterfightdata.name, monsterfightdata.hp);
+                                    if dmg.1 != Status::None {
+                                        monsterfightdata.status = dmg.1;
+                                        println!("{} is afflicted with {:?}!", monsterfightdata.name, dmg.1);
+                                    }
                                     playerturn = false;
                                 }
                                 2 => {
@@ -84,6 +88,10 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
                                     println!("{} did {} damage to {}!", playerfightdata.name, dmg.0, monsterfightdata.name);
                                     monsterfightdata.hp -= dmg.0;
                                     println!("{} has {} HP left!", monsterfightdata.name, monsterfightdata.hp);
+                                    if dmg.1 != Status::None {
+                                        monsterfightdata.status = dmg.1;
+                                        println!("{} is afflicted with {:?}!", monsterfightdata.name, dmg.1);
+                                    }
                                     playerturn = false;
                                 }
                                 3 => {
@@ -91,6 +99,10 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
                                     println!("{} did {} damage to {}!", playerfightdata.name, dmg.0, monsterfightdata.name);
                                     monsterfightdata.hp -= dmg.0;
                                     println!("{} has {} HP left!", monsterfightdata.name, monsterfightdata.hp);
+                                    if dmg.1 != Status::None {
+                                        monsterfightdata.status = dmg.1;
+                                        println!("{} is afflicted with {:?}!", monsterfightdata.name, dmg.1);
+                                    }
                                     playerturn = false;
                                 }
                                 4 => {
@@ -98,6 +110,10 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
                                     println!("{} did {} damage to {}!", playerfightdata.name, dmg.0, monsterfightdata.name);
                                     monsterfightdata.hp -= dmg.0;
                                     println!("{} has {} HP left!", monsterfightdata.name, monsterfightdata.hp);
+                                    if dmg.1 != Status::None {
+                                        monsterfightdata.status = dmg.1;
+                                        println!("{} is afflicted with {:?}!", monsterfightdata.name, dmg.1);
+                                    }
                                     playerturn = false;
                                 }
                                 _ => {
@@ -126,13 +142,7 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
                                 playerturn = false;
                             }
                             else {
-                                println!("You ran!");         
-                                playerfightdata.strength -= strmod;
-                                playerfightdata.dexterity -= dexmod;
-                                playerfightdata.constitution -= conmod;
-                                playerfightdata.intelligence -= intmod;
-                                playerfightdata.wisdom -= wismod;
-                                playerfightdata.charisma -= chamod;
+                                println!("You ran!");
                                 break 'fight;
                             }
                         }
@@ -193,6 +203,10 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
                             println!("{} did {} damage to {}!", monsterfightdata.name, dmg.0, playerfightdata.name);
                             playerfightdata.hp -= dmg.0;
                             println!("{} has {} HP left!", playerfightdata.name, playerfightdata.hp);
+                            if dmg.1 != Status::None {
+                                playerfightdata.status = dmg.1;
+                                println!("{} is afflicted with {:?}!", playerfightdata.name, dmg.1);
+                            }
                             playerturn = true;
                         }
                         1 => {
@@ -200,6 +214,10 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
                             println!("{} did {} damage to {}!", monsterfightdata.name, dmg.0, playerfightdata.name);
                             playerfightdata.hp -= dmg.0;
                             println!("{} has {} HP left!", playerfightdata.name, playerfightdata.hp);
+                            if dmg.1 != Status::None {
+                                playerfightdata.status = dmg.1;
+                                println!("{} is afflicted with {:?}!", playerfightdata.name, dmg.1);
+                            }
                             playerturn = true;
                         }
                         2 => {
@@ -207,6 +225,10 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
                             println!("{} did {} damage to {}!", monsterfightdata.name, dmg.0, playerfightdata.name);
                             playerfightdata.hp -= dmg.0;
                             println!("{} has {} HP left!", playerfightdata.name, playerfightdata.hp);
+                            if dmg.1 != Status::None {
+                                playerfightdata.status = dmg.1;
+                                println!("{} is afflicted with {:?}!", playerfightdata.name, dmg.1);
+                            }
                             playerturn = true;
                         }
                         3 => {
@@ -214,6 +236,10 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
                             println!("{} did {} damage to {}!", monsterfightdata.name, dmg.0, playerfightdata.name);
                             playerfightdata.hp -= dmg.0;
                             println!("{} has {} HP left!", playerfightdata.name, playerfightdata.hp);
+                            if dmg.1 != Status::None {
+                                playerfightdata.status = dmg.1;
+                                println!("{} is afflicted with {:?}!", playerfightdata.name, dmg.1);
+                            }
                             playerturn = true;
                         }
 
@@ -242,12 +268,17 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
                 println!("Acquired {:?}!", item);
             }
         }
-        playerfightdata.strength -= strmod;
-        playerfightdata.dexterity -= dexmod;
-        playerfightdata.constitution -= conmod;
-        playerfightdata.intelligence -= intmod;
-        playerfightdata.wisdom -= wismod;
-        playerfightdata.charisma -= chamod;
+    }
+
+    playerfightdata.strength -= strmod;
+    playerfightdata.dexterity -= dexmod;
+    playerfightdata.constitution -= conmod;
+    playerfightdata.intelligence -= intmod;
+    playerfightdata.wisdom -= wismod;
+    playerfightdata.charisma -= chamod;
+
+    if playerfightdata.status != Status::HatCurse {
+        playerfightdata.status = Status::None;
     }
 
     return playerfightdata;

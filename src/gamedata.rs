@@ -55,7 +55,11 @@ pub struct Room {
     pub west: u32,
     pub monster: MonsterList,
     pub area: Area,
-    pub encval: u32 // Every room has a set value in which encounters are triggered; 0 is guaranteed encounter, and a sufficiently high number is no encounter.
+    pub encval: u32, // Every room has a set value in which encounters are triggered; 0 is guaranteed encounter, and a sufficiently high number is no encounter.
+    pub npc: String,
+    pub items: Vec<Item>,
+    pub money: u64,
+    pub shop: Vec<(Item, u64)>
 }
 
 #[derive(Debug, Hash, Eq, PartialEq, Clone, Copy)]

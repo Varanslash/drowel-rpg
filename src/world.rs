@@ -20,7 +20,11 @@ pub fn init() -> (HashMap<u32, Room>, HashMap<MonsterList, Monster>, HashMap<Are
             west: 0,
             monster: MonsterList::Goblin,
             area: Area::Forest,
-            encval: 20
+            encval: 20,
+            npc: "No one to talk to!".to_string(),
+            items: Vec::new(),
+            money: 20,
+            shop: Vec::new()
         }),
         (2, Room {
             description: "You are on a mountain trail. [S]".to_string(),
@@ -32,7 +36,11 @@ pub fn init() -> (HashMap<u32, Room>, HashMap<MonsterList, Monster>, HashMap<Are
             west: 0,
             monster: MonsterList::Orc,
             area: Area::Forest,
-            encval: 20
+            encval: 20,
+            npc: "No one to talk to!".to_string(),
+            items: Vec::new(),
+            money: 0,
+            shop: Vec::new()
         }),
         (3, Room {
             description: "You are in a cave. [N]".to_string(),
@@ -44,7 +52,11 @@ pub fn init() -> (HashMap<u32, Room>, HashMap<MonsterList, Monster>, HashMap<Are
             west: 0,
             monster: MonsterList::Goblin,
             area: Area::Forest,
-            encval: 20
+            encval: 20,
+            npc: "No one to talk to!".to_string(),
+            items: Vec::new(),
+            money: 0,
+            shop: Vec::new()
         }),
     ]);
 
