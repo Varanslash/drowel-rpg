@@ -135,6 +135,56 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
                             println!("------END------");
                             continue;
                         }
+
+                        "use" | "u" => {
+                            if playerfightdata.items.len() > 0 {
+                                println!("What item would you like to use?");
+                                let mut bagidx = 1;
+                                for item in &playerfightdata.items {
+                                    println!("- Index: {}, Item: {:?}", bagidx, item);
+                                    bagidx += 1;
+                                }
+
+                                let mut bagitem = String::new();
+                                std::io::stdin().read_line(&mut bagitem).expect("Failed to read line");
+
+                                let bagitemidx: i32 = match bagitem.trim().parse() {
+                                    Ok(val) => {
+                                        val
+                                    }
+                                    Err(_) => {
+                                        println!("You have to pick a number!");
+                                        continue;
+                                    }
+                                };
+
+                                if bagitemidx <= 0 {
+                                    println!("Invalid item index!");
+                                    continue;
+                                }
+
+                                else if (bagitemidx as usize - 1) >= playerfightdata.items.len() {
+                                    println!("This item doesn't exist!");
+                                    continue;
+                                }
+
+                                else {
+                                    let itemused = playerfightdata.items.remove(bagitemidx as usize - 1);
+                                    match itemused {
+                                        _ => {
+                                            println!("{:?} was used.", itemused);
+                                        }
+                                    }
+                                }
+                            }
+
+                            else {
+                                println!("No items in bag!");
+                                continue;
+                            }
+
+                            playerturn = false;
+                        }
                         _ => {
                             println!("Invalid action!");
                             continue;
@@ -220,6 +270,10 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
             for item in monsterfightdata.items {
                 playerfightdata.items.push(item);
                 println!("Acquired {:?}!", item);
+            }
+            for item in monsterfightdata.keys {
+                playerfightdata.keys.push(item);
+                println!("Acquired key item {:?}!", item);
             }
         }
     }

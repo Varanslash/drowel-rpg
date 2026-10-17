@@ -23,6 +23,7 @@ pub fn init() -> (HashMap<u32, Room>, HashMap<MonsterList, Monster>, HashMap<Are
             encval: 20,
             npc: "No one to talk to!".to_string(),
             items: Vec::new(),
+            keys: Vec::new(),
             money: 20,
             shop: Vec::new()
         }),
@@ -39,6 +40,7 @@ pub fn init() -> (HashMap<u32, Room>, HashMap<MonsterList, Monster>, HashMap<Are
             encval: 20,
             npc: "No one to talk to!".to_string(),
             items: Vec::new(),
+            keys: Vec::new(),
             money: 0,
             shop: Vec::new()
         }),
@@ -55,6 +57,7 @@ pub fn init() -> (HashMap<u32, Room>, HashMap<MonsterList, Monster>, HashMap<Are
             encval: 20,
             npc: "No one to talk to!".to_string(),
             items: Vec::new(),
+            keys: Vec::new(),
             money: 0,
             shop: Vec::new()
         }),
@@ -79,6 +82,7 @@ pub fn init() -> (HashMap<u32, Room>, HashMap<MonsterList, Monster>, HashMap<Are
             attack_formula_4: mon_nanattack,
             xp: 10,
             items: Vec::new(),
+            keys: Vec::new(),
             status: Status::None,
             passive: Passive::None,
             initiative: false,
@@ -101,6 +105,7 @@ pub fn init() -> (HashMap<u32, Room>, HashMap<MonsterList, Monster>, HashMap<Are
             attack_formula_4: mon_nanattack,
             xp: 20,
             items: Vec::new(),
+            keys: Vec::new(),
             status: Status::None,
             passive: Passive::None,
             initiative: false,

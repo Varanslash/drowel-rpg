@@ -16,6 +16,7 @@ pub struct Monster {
     pub attack_formula_4: fn(&Monster) -> (i32, Status),
     pub xp: u64,
     pub items: Vec<Item>,
+    pub keys: Vec<Item>,
     pub status: Status,
     pub passive: Passive,
     pub initiative: bool,
@@ -41,6 +42,7 @@ pub struct Player {
     pub attack_formula_4: fn(&Player) -> (i32, Status),
     pub xp: u64,
     pub items: Vec<Item>,
+    pub keys: Vec<Item>,
     pub status: Status,
     pub passive: Passive,
     pub money: u64
@@ -60,6 +62,7 @@ pub struct Room {
     pub encval: u32, // Every room has a set value in which encounters are triggered; 0 is guaranteed encounter, and a sufficiently high number is no encounter.
     pub npc: String,
     pub items: Vec<Item>,
+    pub keys: Vec<Item>,
     pub money: u64,
     pub shop: Vec<(Item, u64)>
 }

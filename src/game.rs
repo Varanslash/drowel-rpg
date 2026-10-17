@@ -29,6 +29,16 @@ pub fn game(mut player: Player, mut rooms: HashMap<u32, Room>, monsterdata: Hash
     "drop", "d"]; 
     // List of valid commands for internal use
 
+    let attacklist: HashMap<(Class, i32), [fn(&Player) -> (i32, Status); 4]> = HashMap::from([
+        ((Class::Wizard, 1), [nanattack as fn(&Player) -> (i32, Status), nanattack, nanattack, nanattack]),
+        ((Class::Fighter, 1), [nanattack, nanattack, nanattack, nanattack]),
+        ((Class::Bishop, 1), [nanattack, nanattack, nanattack, nanattack]),
+        ((Class::Druid, 1), [nanattack, nanattack, nanattack, nanattack]),
+        ((Class::Paladin, 1), [nanattack, nanattack, nanattack, nanattack]),
+        ((Class::Barbarian, 1), [nanattack, nanattack, nanattack, nanattack]),
+        ((Class::Bard, 1), [nanattack, nanattack, nanattack, nanattack]),
+    ]);
+
     // Game loop
     while room != 0 && room != 3900000 { // 0 = invalid room; 3900000 = credits (the final boss's room is 3899999, one step before)
         let roomdata = rooms.get_mut(&room).unwrap();
@@ -64,6 +74,20 @@ pub fn game(mut player: Player, mut rooms: HashMap<u32, Room>, monsterdata: Hash
                 else {
                     player.maxhp += (player.constitution - 1) / 2;
                 }
+                let attacks = attacklist.get(&(player.class, player.level));
+                match attacks {
+                    Some(set) => {
+                        player.attack_formula   = set[0];
+                        player.attack_formula_2 = set[1];
+                        player.attack_formula_3 = set[2];
+                        player.attack_formula_4 = set[3];
+                        println!("Your attacks have upgraded!");
+                    }
+                    None => {
+
+                    }
+                }
+
             }
 
             match room {
@@ -144,6 +168,16 @@ pub fn game(mut player: Player, mut rooms: HashMap<u32, Room>, monsterdata: Hash
                         }
                         else {
                             println!("No items to collect.");
+                        }
+                        if disposablecopy.keys.len() > 0 {
+                            for item in disposablecopy.keys {
+                                player.keys.push(item);
+                                println!("Gained key item {:?}.", item);
+                            }
+                            disposablecopy.keys = Vec::new();
+                        }
+                        else {
+                            println!("No key items to collect.");
                         }
                         rooms.insert(room, disposablecopy);
                     }
@@ -235,6 +269,10 @@ pub fn game(mut player: Player, mut rooms: HashMap<u32, Room>, monsterdata: Hash
                                 }
                             }
                         }
+
+                        else {
+                            println!("No items in bag!");
+                        }
                     }
 
                     "inspect" | "i" => {
@@ -242,6 +280,7 @@ pub fn game(mut player: Player, mut rooms: HashMap<u32, Room>, monsterdata: Hash
                     }
 
                     "bag" | "bg" => {
+                        println!("---ITEMS---");
                         if player.items.len() > 0 {
                             let mut bagidx = 1;
                             for item in &player.items {
@@ -252,10 +291,23 @@ pub fn game(mut player: Player, mut rooms: HashMap<u32, Room>, monsterdata: Hash
                         else {
                             println!("No items in bag!")
                         }
+                        println!("-KEY ITEMS-");
+                        if player.keys.len() > 0 {
+                            let mut bagidx = 1;
+                            for item in &player.keys {
+                                println!("- Index: {}, Item: {:?}", bagidx, item);
+                                bagidx += 1;
+                            }
+                        }
+                        else {
+                            println!("No key items in bag!")
+                        }
+                        println!("----END----")
                     }
 
                     "wait" | "wt" => {
                         println!("You waited.");
+                        encvaltracker += room % 4;
                     }
 
                     "trigger" | "tr" => {

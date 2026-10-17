@@ -181,6 +181,7 @@ fn main() {
         attack_formula_4: attackformulas[3],
         xp: 0,
         items: Vec::new(),
+        keys: Vec::new(),
         status: Status::None,
         passive: Passive::None,
         money: 0
