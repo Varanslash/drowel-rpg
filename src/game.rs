@@ -23,7 +23,7 @@ pub fn game(mut player: Player, mut rooms: HashMap<u32, Room>, monsterdata: Hash
     "buy", "b",
     "use", "u",
     "inspect", "i",
-    "buy", "bg",
+    "bag", "bg",
     "wait", "wt",
     "trigger", "tr",
     "drop", "d"]; 
@@ -307,7 +307,7 @@ pub fn game(mut player: Player, mut rooms: HashMap<u32, Room>, monsterdata: Hash
 
                     "wait" | "wt" => {
                         println!("You waited.");
-                        encvaltracker += room % 4;
+                        encvaltracker += 1;
                     }
 
                     "trigger" | "tr" => {
@@ -350,7 +350,7 @@ pub fn game(mut player: Player, mut rooms: HashMap<u32, Room>, monsterdata: Hash
 
                             else {
                                 let itemused = player.items.remove(bagitemidx as usize - 1);
-                                println!("{:?} was used.", itemused);
+                                println!("{:?} was dropped.", itemused);
                             }
                         }
                     }

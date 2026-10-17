@@ -271,6 +271,8 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
                 playerfightdata.items.push(item);
                 println!("Acquired {:?}!", item);
             }
+        }
+        if monsterfightdata.keys.len() > 0 {
             for item in monsterfightdata.keys {
                 playerfightdata.keys.push(item);
                 println!("Acquired key item {:?}!", item);

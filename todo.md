@@ -1,10 +1,10 @@
 todo:
 
 engine:
-- make use command for battle
++ make use command for battle
 + make drop command
 + make monster level system
-- make attack upgrades
++ make attack upgrades
 + boolflag for battle wins; only used during bossfights so normal rooms discard it
 + wait command
 + room scripting match statement (possible event enum???)
@@ -15,7 +15,7 @@ engine:
 + hp growing
 + monster initiative
 + turn counter
-- add key items
++ add key items
 
 data:
 - make player attacks
