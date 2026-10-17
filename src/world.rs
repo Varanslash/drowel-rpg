@@ -81,6 +81,7 @@ pub fn init() -> (HashMap<u32, Room>, HashMap<MonsterList, Monster>, HashMap<Are
             items: Vec::new(),
             status: Status::None,
             passive: Passive::None,
+            initiative: false,
             money: 5
         }),
         (MonsterList::Orc, Monster {
@@ -102,6 +103,7 @@ pub fn init() -> (HashMap<u32, Room>, HashMap<MonsterList, Monster>, HashMap<Are
             items: Vec::new(),
             status: Status::None,
             passive: Passive::None,
+            initiative: false,
             money: 10
         }),
     ]);
@@ -115,4 +117,9 @@ pub fn init() -> (HashMap<u32, Room>, HashMap<MonsterList, Monster>, HashMap<Are
     ]);
 
     return (rooms, monsterdata, maps);
+}
+
+pub fn credits() -> ! {
+    println!("credits or something idk");
+    std::process::exit(0);
 }

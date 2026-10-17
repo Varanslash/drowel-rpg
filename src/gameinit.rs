@@ -4,11 +4,13 @@ mod playerattackdata;
 mod monsterattackdata;
 mod encounter;
 mod world;
+mod itemformulas;
 use game::game;
 use gamedata::*;
 use playerattackdata::*;
 use std::collections::HashMap;
 use world::init;
+use world::credits;
 
 const budgetforstats: i32 = 64;
 const statcap: i32 = 20;
@@ -171,6 +173,7 @@ fn main() {
         level: 1,
         name: name.trim().to_string(),
         hp: 40,
+        maxhp: 40,
         class: class,
         attack_formula: attackformulas[0],
         attack_formula_2: attackformulas[1],
@@ -185,4 +188,5 @@ fn main() {
 
     let world = init();
     game(player, world.0, world.1, world.2);
+    credits();
 }

@@ -7,6 +7,7 @@ use gamedata::*;
 use playerattackdata::*;
 use monsterattackdata::*;
 use encounter::*;
+use crate::itemformulas::*;
 
 pub fn game(mut player: Player, mut rooms: HashMap<u32, Room>, monsterdata: HashMap<MonsterList, Monster>, maps: HashMap<Area, String>) {
     // Game Data Initialization
@@ -20,14 +21,26 @@ pub fn game(mut player: Player, mut rooms: HashMap<u32, Room>, monsterdata: Hash
     "gather", "g",
     "i'm from the 80's. we tried so hard to sound like we were from the year 2019, so that you kids would love us one day and forgive us for everything else we did.",
     "buy", "b",
-    "use", "u"]; 
+    "use", "u",
+    "inspect", "i",
+    "buy", "bg",
+    "wait", "wt",
+    "trigger", "tr",
+    "drop", "d"]; 
     // List of valid commands for internal use
 
     // Game loop
     while room != 0 && room != 3900000 { // 0 = invalid room; 3900000 = credits (the final boss's room is 3899999, one step before)
-        let roomdata = rooms.get(&room).unwrap();
-        if encvaltracker >= roomdata.encval { // Always check in beginning for monster encounters
-            player = encounter::encounter(player, roomdata.monster, &monsterdata);
+        let roomdata = rooms.get_mut(&room).unwrap();
+
+        match room {
+            _ => {}
+        }
+
+        if encvaltracker >= roomdata.encval { // Always check in beginning after special room scripting for monster encounters
+            let encbool = encounter::encounter(player, roomdata.monster, &monsterdata);
+            player = encbool.0;
+            let wincheck = encbool.1;
             if player.hp < 0 {
                 println!("You died!");
                 std::process::exit(0);
@@ -45,6 +58,16 @@ pub fn game(mut player: Player, mut rooms: HashMap<u32, Room>, monsterdata: Hash
                     player.charisma += 1;
                     println!("Character upgrade! +1 to every stat.")
                 }
+                if player.constitution % 2 == 0 {
+                    player.maxhp += player.constitution / 2;
+                }
+                else {
+                    player.maxhp += (player.constitution - 1) / 2;
+                }
+            }
+
+            match room {
+                _ => {}
             }
         }
 
@@ -69,30 +92,12 @@ pub fn game(mut player: Player, mut rooms: HashMap<u32, Room>, monsterdata: Hash
                     }
 
                     "help" | "?" => {
-                        println!("Available commands: north (n), south (s), east (e), west (w), help (?), help verbose (hv), map (m), stat (st), gather (g), talk (t), buy (b), use (u)");
+                        println!("Available commands: north (n), south (s), east (e), west (w), help (?), help verbose (hv), map (m), stat (st), gather (g), talk (t), buy (b), use (u), inspect (i), bag (bg), wait (wt), trigger (tr), drop (d)");
                         println!("You can type \"help verbose\" (hv) to get a more detailed description of available actions.");
                     }
 
                     "help verbose" | "hv" => {
-                        println!("-----START-----");
-                        println!("\"west\" (w) - Moves west if available.");
-                        println!("\"east\" (e) - Moves east if available.");
-                        println!("\"north\" (n) - Moves north if available.");
-                        println!("\"south\" (s) - Moves south if available.");
-                        println!("\"help\" (?) - Displays a simple list of commands.");
-                        println!("\"help verbose\" (hv) - Displays this list.");
-                        println!("\"map\" (m) - Displays an indexed map of the current area.");
-                        println!("\"stat\" (st) - Displays a detailed view of player stats.");
-                        println!("\"talk\" (t) - Talks to any NPC in the room if there is one.");
-                        println!("\"gather\" (g) - Gathers any items and money that may reside in the room.");
-                        println!("\"buy\" (b) - Buys an item from a shop, if there is one.");
-                        println!("\"use\" (u) - Uses an item from your inventory.");
-                        println!("---ATTACK COMMANDS---");
-                        println!("\"attack\" (a) - Attacks any one of four attacks based on player choice.");
-                        println!("\"run\" (r) - Runs from battle. If a monster outcompetes you on 2/3 physical stats, then the run fails and the monster gets a free turn.");
-                        println!("\"help\" (?) - Displays a simple list of attack commands.");
-                        println!("\"stat\" (s) - Displays player and monster stats.");
-                        println!("------END------");
+                        hv();
                     }
 
                     "stat" | "st" => {
@@ -101,7 +106,7 @@ pub fn game(mut player: Player, mut rooms: HashMap<u32, Room>, monsterdata: Hash
                         println!("Player name: {}", player.name);
                         println!("Player level: {}", player.level);
                         println!("Player XP: {}", player.xp);
-                        println!("Player HP: {}", player.hp);
+                        println!("Player HP/Max HP: {}/{}", player.hp, player.maxhp);
                         println!("Player class: {:?}", player.class);
 
                         if &player.items.len() > &0 {
@@ -232,12 +237,78 @@ pub fn game(mut player: Player, mut rooms: HashMap<u32, Room>, monsterdata: Hash
                         }
                     }
 
+                    "inspect" | "i" => {
+                        println!("On inspection: {}", roomdata.description2);
+                    }
+
+                    "bag" | "bg" => {
+                        if player.items.len() > 0 {
+                            let mut bagidx = 1;
+                            for item in &player.items {
+                                println!("- Index: {}, Item: {:?}", bagidx, item);
+                                bagidx += 1;
+                            }
+                        }
+                        else {
+                            println!("No items in bag!")
+                        }
+                    }
+
+                    "wait" | "wt" => {
+                        println!("You waited.");
+                    }
+
+                    "trigger" | "tr" => {
+                        match room {
+                            _ => { println!("You attempted to trigger something. Nothing happened."); }
+                        }
+                    }
+
+                    "drop" | "d" => {
+                        if player.items.len() > 0 {
+                            println!("What item would you like to drop?");
+                            let mut bagidx = 1;
+                            for item in &player.items {
+                                println!("- Index: {}, Item: {:?}", bagidx, item);
+                                bagidx += 1;
+                            }
+
+                            let mut bagitem = String::new();
+                            std::io::stdin().read_line(&mut bagitem).expect("Failed to read line");
+
+                            let bagitemidx: i32 = match bagitem.trim().parse() {
+                                Ok(val) => {
+                                    val
+                                }
+                                Err(_) => {
+                                    println!("You have to pick a number!");
+                                    continue;
+                                }
+                            };
+
+                            if bagitemidx <= 0 {
+                                println!("Invalid item index!");
+                                continue;
+                            }
+
+                            else if (bagitemidx as usize - 1) >= player.items.len() {
+                                println!("This item doesn't exist!");
+                                continue;
+                            }
+
+                            else {
+                                let itemused = player.items.remove(bagitemidx as usize - 1);
+                                println!("{:?} was used.", itemused);
+                            }
+                        }
+                    }
+
                     "i'm from the 80's. we tried so hard to sound like we were from the year 2019, so that you kids would love us one day and forgive us for everything else we did." => {
                         println!("https://youtu.be/AJUuOMInBds")
                     }
 
                     _ => {
-                        eprintln!("Every command here should be valid. If you see this message, either a command was coded but not implemented yet or a mangled command is somehow coded in. Command: {}", cmd);
+                        eprintln!("E-001; Every command here should be valid. If you see this message, either a command was coded but not implemented yet or a mangled command is somehow coded in. Command: {}", cmd);
                         std::process::exit(1);
                     }
                 }
@@ -247,6 +318,16 @@ pub fn game(mut player: Player, mut rooms: HashMap<u32, Room>, monsterdata: Hash
             }
         }
     }
+
+    if room == 0 {
+        eprintln!("E-003; Room index is invalid.");
+        std::process::exit(1);
+    }
+
+    if room == 3900000 {
+        return;
+    }
+
 }
 
 pub fn movement(
@@ -282,4 +363,31 @@ pub fn movement(
     }
 
     return dest;
+}
+
+pub fn hv() {
+    println!("-----START-----");
+    println!("\"west\" (w) - Moves west if available.");
+    println!("\"east\" (e) - Moves east if available.");
+    println!("\"north\" (n) - Moves north if available.");
+    println!("\"south\" (s) - Moves south if available.");
+    println!("\"help\" (?) - Displays a simple list of commands.");
+    println!("\"help verbose\" (hv) - Displays this list.");
+    println!("\"map\" (m) - Displays an indexed map of the current area.");
+    println!("\"stat\" (st) - Displays a detailed view of player stats.");
+    println!("\"talk\" (t) - Talks to any NPC in the room if there is one.");
+    println!("\"gather\" (g) - Gathers any items and money that may reside in the room.");
+    println!("\"buy\" (b) - Buys an item from a shop, if there is one.");
+    println!("\"use\" (u) - Uses an item from your inventory.");
+    println!("\"inspect\" (i) - Inspects a room.");
+    println!("\"bag\" (bg) - Displays your bag.");
+    println!("\"wait\" (wt) - Waits. Does literally nothing but waits.");
+    println!("\"trigger\" (tr) - Triggers special room events in certain rooms.");
+    println!("\"drop\" (d) - Drops an item from your inventory.");
+    println!("---ATTACK COMMANDS---");
+    println!("\"attack\" (a) - Attacks any one of four attacks based on player choice.");
+    println!("\"run\" (r) - Runs from battle. If a monster outcompetes you on 2/3 physical stats, then the run fails and the monster gets a free turn.");
+    println!("\"help\" (?) - Displays a simple list of attack commands.");
+    println!("\"stat\" (s) - Displays player and monster stats.");
+    println!("------END------");
 }

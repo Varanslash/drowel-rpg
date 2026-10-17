@@ -6,17 +6,25 @@ use gamedata::*;
 use playerattackdata::*;
 use monsterattackdata::*;
 
-pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap<MonsterList, Monster>) -> Player {
-    let mut playerturn = true;
+pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap<MonsterList, Monster>) -> (Player, bool) {
     let mut strmod = 0;
     let mut dexmod = 0;
     let mut conmod = 0;
     let mut intmod = 0;
     let mut wismod = 0;
     let mut chamod = 0;
+    let mut turncounter = 0;
     println!("{:?} has appeared!", monster);
     let mut monsterfightdata = monsterdata.get(&monster).unwrap().clone();
     let mut playerfightdata = player;
+    let mut playerturn = !monsterfightdata.initiative;
+
+    if monsterfightdata.trail >= playerfightdata.level {
+        monsterfightdata.level = 1;
+    }
+    else {
+        monsterfightdata.level = playerfightdata.level - monsterfightdata.trail;
+    }
 
     // Fight Loop
     'fight: while monsterfightdata.hp >= 0 && playerfightdata.hp >= 0 {
@@ -31,7 +39,7 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
 
                     }
                     _ => {
-                        eprintln!("Either this status doesn't exist (wrong naming, mangled) or you forgot to implement a status here. Status: {:?}", playerfightdata.status);
+                        eprintln!("E-001; Either this status doesn't exist (wrong naming, mangled) or you forgot to implement a status here. Status: {:?}", playerfightdata.status);
                         std::process::exit(1);
                     }
                 }
@@ -42,7 +50,7 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
 
                     }
                     _ => {
-                        eprintln!("Either this passive ability doesn't exist (wrong naming, mangled) or you forgot to implement one here. Status: {:?}", playerfightdata.passive);
+                        eprintln!("E-001; Either this passive ability doesn't exist (wrong naming, mangled) or you forgot to implement one here. Status: {:?}", playerfightdata.passive);
                         std::process::exit(1);
                     }
                 }
@@ -71,42 +79,11 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
                                 }
                             };
 
+                            let attacksforplayer = [playerfightdata.attack_formula, playerfightdata.attack_formula_2, playerfightdata.attack_formula_3, playerfightdata.attack_formula_4];
+
                             match idx {
-                                1 => {
-                                    let dmg = (playerfightdata.attack_formula)(&playerfightdata);
-                                    println!("{} did {} damage to {}!", playerfightdata.name, dmg.0, monsterfightdata.name);
-                                    monsterfightdata.hp -= dmg.0;
-                                    println!("{} has {} HP left!", monsterfightdata.name, monsterfightdata.hp);
-                                    if dmg.1 != Status::None {
-                                        monsterfightdata.status = dmg.1;
-                                        println!("{} is afflicted with {:?}!", monsterfightdata.name, dmg.1);
-                                    }
-                                    playerturn = false;
-                                }
-                                2 => {
-                                    let dmg = (playerfightdata.attack_formula_2)(&playerfightdata);
-                                    println!("{} did {} damage to {}!", playerfightdata.name, dmg.0, monsterfightdata.name);
-                                    monsterfightdata.hp -= dmg.0;
-                                    println!("{} has {} HP left!", monsterfightdata.name, monsterfightdata.hp);
-                                    if dmg.1 != Status::None {
-                                        monsterfightdata.status = dmg.1;
-                                        println!("{} is afflicted with {:?}!", monsterfightdata.name, dmg.1);
-                                    }
-                                    playerturn = false;
-                                }
-                                3 => {
-                                    let dmg = (playerfightdata.attack_formula_3)(&playerfightdata);
-                                    println!("{} did {} damage to {}!", playerfightdata.name, dmg.0, monsterfightdata.name);
-                                    monsterfightdata.hp -= dmg.0;
-                                    println!("{} has {} HP left!", monsterfightdata.name, monsterfightdata.hp);
-                                    if dmg.1 != Status::None {
-                                        monsterfightdata.status = dmg.1;
-                                        println!("{} is afflicted with {:?}!", monsterfightdata.name, dmg.1);
-                                    }
-                                    playerturn = false;
-                                }
-                                4 => {
-                                    let dmg = (playerfightdata.attack_formula_4)(&playerfightdata);
+                                1 | 2 | 3 | 4 => {
+                                    let dmg = (attacksforplayer[idx as usize - 1])(&playerfightdata);
                                     println!("{} did {} damage to {}!", playerfightdata.name, dmg.0, monsterfightdata.name);
                                     monsterfightdata.hp -= dmg.0;
                                     println!("{} has {} HP left!", monsterfightdata.name, monsterfightdata.hp);
@@ -164,6 +141,10 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
                         }
                     }
 
+                    if playerfightdata.hp > playerfightdata.maxhp {
+                        playerfightdata.hp = playerfightdata.maxhp;
+                    }
+
                     if playerturn == false {
                         break;
                     }
@@ -178,7 +159,7 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
 
                     }
                     _ => {
-                        eprintln!("Either this status doesn't exist (wrong naming, mangled) or you forgot to implement a status here. Status: {:?}", monsterfightdata.status);
+                        eprintln!("E-001; Either this status doesn't exist (wrong naming, mangled) or you forgot to implement a status here. Status: {:?}", monsterfightdata.status);
                         std::process::exit(1);
                     }
                 }
@@ -188,51 +169,20 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
 
                     }
                     _ => {
-                        eprintln!("Either this passive ability doesn't exist (wrong naming, mangled) or you forgot to implement one here. Status: {:?}", monsterfightdata.passive);
+                        eprintln!("E-001; Either this passive ability doesn't exist (wrong naming, mangled) or you forgot to implement one here. Status: {:?}", monsterfightdata.passive);
                         std::process::exit(1);
                     }
                 }
 
                 loop {
                     println!("Monster's turn.");
-                    let attackindex = monsterfightdata.hp % 4;
+                    let attackindex = (monsterfightdata.hp % 4).abs();
                     // Choose an attack based on monster health; this makes it seem somewhat random since different attacks would do different damage to the monster
+                    let attacksformonster = [monsterfightdata.attack_formula, monsterfightdata.attack_formula_2, monsterfightdata.attack_formula_3, monsterfightdata.attack_formula_4];
+
                     match attackindex {
-                        0 => {
-                            let dmg = (monsterfightdata.attack_formula)(&monsterfightdata);
-                            println!("{} did {} damage to {}!", monsterfightdata.name, dmg.0, playerfightdata.name);
-                            playerfightdata.hp -= dmg.0;
-                            println!("{} has {} HP left!", playerfightdata.name, playerfightdata.hp);
-                            if dmg.1 != Status::None {
-                                playerfightdata.status = dmg.1;
-                                println!("{} is afflicted with {:?}!", playerfightdata.name, dmg.1);
-                            }
-                            playerturn = true;
-                        }
-                        1 => {
-                            let dmg = (monsterfightdata.attack_formula_2)(&monsterfightdata);
-                            println!("{} did {} damage to {}!", monsterfightdata.name, dmg.0, playerfightdata.name);
-                            playerfightdata.hp -= dmg.0;
-                            println!("{} has {} HP left!", playerfightdata.name, playerfightdata.hp);
-                            if dmg.1 != Status::None {
-                                playerfightdata.status = dmg.1;
-                                println!("{} is afflicted with {:?}!", playerfightdata.name, dmg.1);
-                            }
-                            playerturn = true;
-                        }
-                        2 => {
-                            let dmg = (monsterfightdata.attack_formula_3)(&monsterfightdata);
-                            println!("{} did {} damage to {}!", monsterfightdata.name, dmg.0, playerfightdata.name);
-                            playerfightdata.hp -= dmg.0;
-                            println!("{} has {} HP left!", playerfightdata.name, playerfightdata.hp);
-                            if dmg.1 != Status::None {
-                                playerfightdata.status = dmg.1;
-                                println!("{} is afflicted with {:?}!", playerfightdata.name, dmg.1);
-                            }
-                            playerturn = true;
-                        }
-                        3 => {
-                            let dmg = (monsterfightdata.attack_formula_4)(&monsterfightdata);
+                        0 | 1 | 2 | 3 => {
+                            let dmg = (attacksformonster[attackindex as usize])(&monsterfightdata);
                             println!("{} did {} damage to {}!", monsterfightdata.name, dmg.0, playerfightdata.name);
                             playerfightdata.hp -= dmg.0;
                             println!("{} has {} HP left!", playerfightdata.name, playerfightdata.hp);
@@ -245,12 +195,13 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
 
                         // This branch should not happen, which is why it errors and exits
                         _ => {
-                            eprintln!("Error: Invalid attack index; mod 4 returned 4 or higher");
+                            eprintln!("E-002; Invalid attack index; mod 4 returned 4 or higher");
                             std::process::exit(1);
                         }
                     }
 
                     if playerturn == true {
+                        turncounter += 1;
                         break;
                     }
                 }
@@ -258,7 +209,10 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
         }
     }
 
+    let mut win = false;
+
     if monsterfightdata.hp < 0 {
+        win = true;
         playerfightdata.xp += monsterfightdata.xp;
         playerfightdata.money += monsterfightdata.money;
         println!("You win! Gain {} xp and {} gold.", monsterfightdata.xp, monsterfightdata.money);
@@ -281,5 +235,5 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
         playerfightdata.status = Status::None;
     }
 
-    return playerfightdata;
+    return (playerfightdata, win);
 }

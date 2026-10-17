@@ -18,6 +18,7 @@ pub struct Monster {
     pub items: Vec<Item>,
     pub status: Status,
     pub passive: Passive,
+    pub initiative: bool,
     pub money: u64
 }
 
@@ -32,6 +33,7 @@ pub struct Player {
     pub level: i32,
     pub name: String,
     pub hp: i32,
+    pub maxhp: i32,
     pub class: Class,
     pub attack_formula: fn(&Player) -> (i32, Status),
     pub attack_formula_2: fn(&Player) -> (i32, Status),
