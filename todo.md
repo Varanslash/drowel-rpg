@@ -2,17 +2,20 @@ todo:
 
 engine:
 - make use command for battle
-- make drop command
-- make monster level system
++ make drop command
++ make monster level system
 - make attack upgrades
-- boolflag for battle wins; only used during bossfights so normal rooms discard it
-- wait command
-- room scripting match statement (possible event enum???)
-- trigger command
-- bag command
-- inspect command
-- credits
-- hp growing
++ boolflag for battle wins; only used during bossfights so normal rooms discard it
++ wait command
++ room scripting match statement (possible event enum???)
++ trigger command
++ bag command
++ inspect command
++ credits
++ hp growing
++ monster initiative
++ turn counter
+- add key items
 
 data:
 - make player attacks
@@ -23,6 +26,10 @@ data:
 - fill item enum
 - fill status enum
 - fill area enum
+- fill credits
+- make key items
+- make status functions
+- make item functions
 - make monster data
 - make map data
 - make passive effects
@@ -41,6 +48,7 @@ optional:
 - kill command (kills an npc)
 - home bases
 - bauthic for some characters
+- talking during battle (saves your turn)
 
 meta:
 - monster manual
