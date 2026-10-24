@@ -84,6 +84,7 @@ pub fn init() -> (HashMap<u32, Room>, HashMap<MonsterList, Monster>, HashMap<Are
             items: Vec::new(),
             keys: Vec::new(),
             status: Status::None,
+            healtimings: vec![3, 3, 3, 3],
             passive: Passive::None,
             initiative: false,
             money: 5
@@ -107,9 +108,34 @@ pub fn init() -> (HashMap<u32, Room>, HashMap<MonsterList, Monster>, HashMap<Are
             items: Vec::new(),
             keys: Vec::new(),
             status: Status::None,
+            healtimings: vec![3, 3, 3, 3],
             passive: Passive::None,
             initiative: false,
             money: 10
+        }),
+        (MonsterList::Ulfilas, Monster {
+            strength: 16,
+            dexterity: 16,
+            constitution: 13,
+            intelligence: 18,
+            wisdom: 20,
+            charisma: 20,
+            level: 1,
+            trail: 0,
+            name: "Bishop Ulfilas, God's Unchanging Hand".to_string(),
+            hp: 220,
+            attack_formula: mon_nanattack,
+            attack_formula_2: mon_nanattack,
+            attack_formula_3: mon_nanattack,
+            attack_formula_4: mon_nanattack,
+            xp: 30000,
+            items: Vec::new(),
+            keys: vec![Item::GothicBible],
+            status: Status::None,
+            healtimings: vec![3, 3, 3, 3],
+            passive: Passive::Regular,
+            initiative: true,
+            money: 0
         }),
     ]);
 

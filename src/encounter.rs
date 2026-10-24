@@ -1,12 +1,20 @@
 use crate::gamedata;
 use crate::playerattackdata;
 use crate::monsterattackdata;
+use crate::helpers;
 use std::collections::HashMap;
 use gamedata::*;
 use playerattackdata::*;
 use monsterattackdata::*;
+use helpers::*;
 
 pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap<MonsterList, Monster>) -> (Player, bool) {
+    if monster == MonsterList::None {
+        return (player, false);
+    }
+    // SystemTime::now().duration_since(UNIX_EPOCH).expect("Time went backwards").as_nanos();
+    // might need this
+
     let mut strmod = 0;
     let mut dexmod = 0;
     let mut conmod = 0;
@@ -18,6 +26,8 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
     let mut monsterfightdata = monsterdata.get(&monster).unwrap().clone();
     let mut playerfightdata = player;
     let mut playerturn = !monsterfightdata.initiative;
+    let mut phealingchannels = vec![0, 0, 0, 0];
+    let mut mhealingchannels = vec![0, 0, 0, 0];
 
     if monsterfightdata.trail >= playerfightdata.level {
         monsterfightdata.level = 1;
@@ -83,7 +93,7 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
 
                             match idx {
                                 1 | 2 | 3 | 4 => {
-                                    let dmg = (attacksforplayer[idx as usize - 1])(&playerfightdata);
+                                    let dmg = (attacksforplayer[idx as usize - 1])(&playerfightdata, &monsterfightdata);
                                     println!("{} did {} damage to {}!", playerfightdata.name, dmg.0, monsterfightdata.name);
                                     monsterfightdata.hp -= dmg.0;
                                     println!("{} has {} HP left!", monsterfightdata.name, monsterfightdata.hp);
@@ -91,6 +101,17 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
                                         monsterfightdata.status = dmg.1;
                                         println!("{} is afflicted with {:?}!", monsterfightdata.name, dmg.1);
                                     }
+
+                                    match monsterfightdata.passive {
+                                        Passive::None => {
+
+                                        }
+                                        _ => {
+                                            eprintln!("E-001; Either this passive ability doesn't exist (wrong naming, mangled) or you forgot to implement one here. Status: {:?}", monsterfightdata.passive);
+                                            std::process::exit(1);
+                                        }
+                                    }
+
                                     playerturn = false;
                                 }
                                 _ => {
@@ -124,7 +145,7 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
                             }
                         }
                         "help" | "?" => {
-                            println!("Available commands in battle: attack (a), run (r), help (?), stat (s)");
+                            println!("Available commands in battle: attack (a), run (r), help (?), stat (s), use (u), trigger (tr)");
                         }
                         "stat" | "s" => {
                             println!("-----STATS-----");
@@ -185,6 +206,20 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
 
                             playerturn = false;
                         }
+
+                        "trigger" | "tr" => {
+                            match playerfightdata.passive {
+                                Passive::None => {
+
+                                }
+                                _ => {
+                                    eprintln!("E-001; Either this passive ability doesn't exist (wrong naming, mangled) or you forgot to implement one here. Status: {:?}", playerfightdata.passive);
+                                    std::process::exit(1);
+                                }
+                            }
+                            playerturn = false;
+                        }
+
                         _ => {
                             println!("Invalid action!");
                             continue;
@@ -193,6 +228,16 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
 
                     if playerfightdata.hp > playerfightdata.maxhp {
                         playerfightdata.hp = playerfightdata.maxhp;
+                    }
+
+                    match playerfightdata.passive {
+                        Passive::None => {
+
+                        }
+                        _ => {
+                            eprintln!("E-001; Either this passive ability doesn't exist (wrong naming, mangled) or you forgot to implement one here. Status: {:?}", playerfightdata.passive);
+                            std::process::exit(1);
+                        }
                     }
 
                     if playerturn == false {
@@ -232,7 +277,7 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
 
                     match attackindex {
                         0 | 1 | 2 | 3 => {
-                            let dmg = (attacksformonster[attackindex as usize])(&monsterfightdata);
+                            let dmg = (attacksformonster[attackindex as usize])(&monsterfightdata, &playerfightdata);
                             println!("{} did {} damage to {}!", monsterfightdata.name, dmg.0, playerfightdata.name);
                             playerfightdata.hp -= dmg.0;
                             println!("{} has {} HP left!", playerfightdata.name, playerfightdata.hp);
@@ -240,12 +285,33 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
                                 playerfightdata.status = dmg.1;
                                 println!("{} is afflicted with {:?}!", playerfightdata.name, dmg.1);
                             }
+
+                            match playerfightdata.passive {
+                                Passive::None => {
+
+                                }
+                                _ => {
+                                    eprintln!("E-001; Either this passive ability doesn't exist (wrong naming, mangled) or you forgot to implement one here. Status: {:?}", playerfightdata.passive);
+                                    std::process::exit(1);
+                                }
+                            }
+
                             playerturn = true;
                         }
 
                         // This branch should not happen, which is why it errors and exits
                         _ => {
                             eprintln!("E-002; Invalid attack index; mod 4 returned 4 or higher");
+                            std::process::exit(1);
+                        }
+                    }
+
+                    match monsterfightdata.passive {
+                        Passive::None => {
+
+                        }
+                        _ => {
+                            eprintln!("E-001; Either this passive ability doesn't exist (wrong naming, mangled) or you forgot to implement one here. Status: {:?}", monsterfightdata.passive);
                             std::process::exit(1);
                         }
                     }

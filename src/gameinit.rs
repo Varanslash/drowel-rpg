@@ -5,6 +5,7 @@ mod monsterattackdata;
 mod encounter;
 mod world;
 mod itemformulas;
+mod helpers;
 use game::game;
 use gamedata::*;
 use playerattackdata::*;
@@ -16,15 +17,42 @@ const budgetforstats: i32 = 64;
 const statcap: i32 = 20;
 
 fn main() {
-    let attacklist: HashMap<Class, [fn(&Player) -> (i32, Status); 4]> = HashMap::from([
-        (Class::Wizard, [nanattack as fn(&Player) -> (i32, Status), nanattack, nanattack, nanattack]),
+    let attacklist: HashMap<Class, [fn(&Player, &Monster) -> (i32, Status); 4]> = HashMap::from([
+        (Class::Wizard, [nanattack as fn(&Player, &Monster) -> (i32, Status), nanattack, nanattack, nanattack]),
         (Class::Fighter, [nanattack, nanattack, nanattack, nanattack]),
         (Class::Bishop, [nanattack, nanattack, nanattack, nanattack]),
         (Class::Druid, [nanattack, nanattack, nanattack, nanattack]),
         (Class::Paladin, [nanattack, nanattack, nanattack, nanattack]),
         (Class::Barbarian, [nanattack, nanattack, nanattack, nanattack]),
         (Class::Bard, [nanattack, nanattack, nanattack, nanattack]),
+        (Class::Rogue, [nanattack, nanattack, nanattack, nanattack]),
+        (Class::Knight, [nanattack, nanattack, nanattack, nanattack]),
+        (Class::Warlock, [nanattack, nanattack, nanattack, nanattack]),
+        (Class::Amazoness, [nanattack, nanattack, nanattack, nanattack]),
+        (Class::Psychic, [nanattack, nanattack, nanattack, nanattack]),
     ]);
+
+    let healtiming: HashMap<Class, Vec<usize>> = HashMap::from([
+        (Class::Wizard, vec![1, 1, 1, 1]),
+        (Class::Fighter, vec![1, 1, 1, 1]),
+        (Class::Bishop, vec![1, 1, 1, 1]),
+        (Class::Druid, vec![1, 1, 1, 1]),
+        (Class::Paladin, vec![1, 1, 1, 1]),
+        (Class::Barbarian, vec![1, 1, 1, 1]),
+        (Class::Bard, vec![1, 1, 1, 1]),
+        (Class::Rogue, vec![1, 1, 1, 1]),
+        (Class::Knight, vec![1, 1, 1, 1]),
+        (Class::Warlock, vec![1, 1, 1, 1]),
+        (Class::Amazoness, vec![1, 1, 1, 1]),
+        (Class::Psychic, vec![1, 1, 1, 1]),
+    ]); // every healing time here uses the following format:
+    // [x, y, z, a], where:
+    // x is partial physical (so like paralysis)
+    // y is total physical (so like freezing)
+    // z is partial mental (so like distraction)
+    // a is total mental (so like schizoprenia)
+    // these do not improve with level, you are literally stuck with these
+
     let char_points = budgetforstats;
     println!("
        █▀▄▄▄█▀                                                               ▄▄▄▀▀▀█
@@ -52,6 +80,11 @@ fn main() {
         "barbarian" => Class::Barbarian,
         "bard" => Class::Bard,
         "druid" => Class::Druid,
+        "knight" => Class::Knight,
+        "rogue" => Class::Rogue,
+        "amazoness" => Class::Amazoness,
+        "psychic" => Class::Psychic,
+        "warlock" => Class::Warlock,
         &_ => {
             println!("Not a valid class!");
             return;
@@ -162,6 +195,7 @@ fn main() {
     }
 
     let attackformulas = attacklist.get(&class).unwrap();
+    let healtimes = healtiming.get(&class).unwrap();
 
     let player = Player {
         strength: strength,
@@ -183,6 +217,7 @@ fn main() {
         items: Vec::new(),
         keys: Vec::new(),
         status: Status::None,
+        healtimings: healtimes.to_vec(),
         passive: Passive::None,
         money: 0
     };
