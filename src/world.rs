@@ -1,11 +1,9 @@
 use crate::gamedata;
-use crate::playerattackdata;
-use crate::monsterattackdata;
+use crate::attackdata;
 use crate::encounter;
 use std::collections::HashMap;
 use gamedata::*;
-use playerattackdata::*;
-use monsterattackdata::*;
+use attackdata::*;
 use encounter::*;
 
 pub fn init() -> (HashMap<u32, Room>, HashMap<MonsterList, Monster>, HashMap<Area, String>) {
@@ -76,10 +74,11 @@ pub fn init() -> (HashMap<u32, Room>, HashMap<MonsterList, Monster>, HashMap<Are
             trail: 3,
             name: "Goblin".to_string(),
             hp: 15,
-            attack_formula: mon_nanattack,
-            attack_formula_2: mon_nanattack,
-            attack_formula_3: mon_nanattack,
-            attack_formula_4: mon_nanattack,
+            mtype: Type::Normal,
+            attack_formula: nanattack,
+            attack_formula_2: nanattack,
+            attack_formula_3: nanattack,
+            attack_formula_4: nanattack,
             xp: 10,
             items: Vec::new(),
             keys: Vec::new(),
@@ -100,10 +99,11 @@ pub fn init() -> (HashMap<u32, Room>, HashMap<MonsterList, Monster>, HashMap<Are
             trail: 2,
             name: "Orc".to_string(),
             hp: 30,
-            attack_formula: mon_nanattack,
-            attack_formula_2: mon_nanattack,
-            attack_formula_3: mon_nanattack,
-            attack_formula_4: mon_nanattack,
+            mtype: Type::Normal,
+            attack_formula: nanattack,
+            attack_formula_2: nanattack,
+            attack_formula_3: nanattack,
+            attack_formula_4: nanattack,
             xp: 20,
             items: Vec::new(),
             keys: Vec::new(),
@@ -124,10 +124,11 @@ pub fn init() -> (HashMap<u32, Room>, HashMap<MonsterList, Monster>, HashMap<Are
             trail: 0,
             name: "Bishop Ulfilas, God's Unchanging Hand".to_string(),
             hp: 220,
-            attack_formula: mon_nanattack,
-            attack_formula_2: mon_nanattack,
-            attack_formula_3: mon_nanattack,
-            attack_formula_4: mon_nanattack,
+            mtype: Type::Normal,
+            attack_formula: nanattack,
+            attack_formula_2: nanattack,
+            attack_formula_3: nanattack,
+            attack_formula_4: nanattack,
             xp: 30000,
             items: Vec::new(),
             keys: vec![Item::GothicBible],

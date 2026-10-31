@@ -1,12 +1,10 @@
 use crate::gamedata;
-use crate::playerattackdata;
-use crate::monsterattackdata;
+use crate::attackdata;
 use crate::encounter;
 use crate::helpers;
 use std::collections::HashMap;
 use gamedata::*;
-use playerattackdata::*;
-use monsterattackdata::*;
+use attackdata::*;
 use encounter::*;
 use helpers::*;
 use crate::itemformulas::*;
@@ -31,8 +29,8 @@ pub fn game(mut player: Player, mut rooms: HashMap<u32, Room>, monsterdata: Hash
     "drop", "d"]; 
     // List of valid commands for internal use
 
-    let attacklist: HashMap<(Class, i32), [fn(&Player, &Monster) -> (i32, Status); 4]> = HashMap::from([
-        ((Class::Wizard, 1), [nanattack as fn(&Player, &Monster) -> (i32, Status), nanattack, nanattack, nanattack]),
+    let attacklist: HashMap<(Class, i32), [Attack; 4]> = HashMap::from([
+        ((Class::Wizard, 1), [nanattack as Attack, nanattack, nanattack, nanattack]),
         ((Class::Fighter, 1), [nanattack, nanattack, nanattack, nanattack]),
         ((Class::Bishop, 1), [nanattack, nanattack, nanattack, nanattack]),
         ((Class::Druid, 1), [nanattack, nanattack, nanattack, nanattack]),

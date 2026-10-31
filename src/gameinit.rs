@@ -1,14 +1,13 @@
 mod game;
 mod gamedata;
-mod playerattackdata;
-mod monsterattackdata;
+mod attackdata;
 mod encounter;
 mod world;
 mod itemformulas;
 mod helpers;
 use game::game;
 use gamedata::*;
-use playerattackdata::*;
+use attackdata::*;
 use std::collections::HashMap;
 use world::init;
 use world::credits;
@@ -17,8 +16,8 @@ const budgetforstats: i32 = 64;
 const statcap: i32 = 20;
 
 fn main() {
-    let attacklist: HashMap<Class, [fn(&Player, &Monster) -> (i32, Status); 4]> = HashMap::from([
-        (Class::Wizard, [nanattack as fn(&Player, &Monster) -> (i32, Status), nanattack, nanattack, nanattack]),
+    let attacklist: HashMap<Class, [Attack; 4]> = HashMap::from([
+        (Class::Wizard, [nanattack as Attack, nanattack, nanattack, nanattack]),
         (Class::Fighter, [nanattack, nanattack, nanattack, nanattack]),
         (Class::Bishop, [nanattack, nanattack, nanattack, nanattack]),
         (Class::Druid, [nanattack, nanattack, nanattack, nanattack]),
@@ -209,6 +208,7 @@ fn main() {
         hp: 40,
         maxhp: 40,
         class: class,
+        ptype: Type::Normal,
         attack_formula: attackformulas[0],
         attack_formula_2: attackformulas[1],
         attack_formula_3: attackformulas[2],

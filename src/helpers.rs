@@ -28,6 +28,7 @@ pub fn hv() {
     println!("------END------");
 }
 
-pub fn dice(x: u64) -> u64 {
-    return ((SystemTime::now().duration_since(UNIX_EPOCH).expect("Time went backwards").as_nanos() as u64) % x) + 1;
+pub fn dice(x: u64, s: u64) -> u64 {
+    let numberthing = (SystemTime::now().duration_since(UNIX_EPOCH).expect("Time went backwards").as_nanos() as u64).wrapping_mul(s);
+    return (numberthing % x) + 1;
 }

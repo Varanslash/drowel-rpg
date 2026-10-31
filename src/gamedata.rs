@@ -1,3 +1,5 @@
+pub type Attack = fn(&Player, &Monster, bool) -> (i32, Status);
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Monster {
     pub strength: i32,
@@ -10,10 +12,11 @@ pub struct Monster {
     pub trail: i32,
     pub name: String,
     pub hp: i32,
-    pub attack_formula: fn(&Monster, &Player) -> (i32, Status),
-    pub attack_formula_2: fn(&Monster, &Player) -> (i32, Status),
-    pub attack_formula_3: fn(&Monster, &Player) -> (i32, Status),
-    pub attack_formula_4: fn(&Monster, &Player) -> (i32, Status),
+    pub mtype: Type,
+    pub attack_formula: Attack,
+    pub attack_formula_2: Attack,
+    pub attack_formula_3: Attack,
+    pub attack_formula_4: Attack,
     pub xp: u64,
     pub items: Vec<Item>,
     pub keys: Vec<Item>,
@@ -37,10 +40,11 @@ pub struct Player {
     pub hp: i32,
     pub maxhp: i32,
     pub class: Class,
-    pub attack_formula: fn(&Player, &Monster) -> (i32, Status),
-    pub attack_formula_2: fn(&Player, &Monster) -> (i32, Status),
-    pub attack_formula_3: fn(&Player, &Monster) -> (i32, Status),
-    pub attack_formula_4: fn(&Player, &Monster) -> (i32, Status),
+    pub ptype: Type,
+    pub attack_formula: Attack,
+    pub attack_formula_2: Attack,
+    pub attack_formula_3: Attack,
+    pub attack_formula_4: Attack,
     pub xp: u64,
     pub items: Vec<Item>,
     pub keys: Vec<Item>,
@@ -67,6 +71,11 @@ pub struct Room {
     pub keys: Vec<Item>,
     pub money: u64,
     pub shop: Vec<(Item, u64)>
+}
+
+#[derive(Debug, Hash, Eq, PartialEq, Clone, Copy)]
+pub enum Type {
+    Normal,
 }
 
 #[derive(Debug, Hash, Eq, PartialEq, Clone, Copy)]
@@ -439,5 +448,8 @@ pub enum Passive {
     Rage,
     Palladium,
     Initiative,
+    MultiattackII,
+    MultiattackIII,
+    Divinity,
     None
 }

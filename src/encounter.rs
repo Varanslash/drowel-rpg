@@ -1,11 +1,9 @@
 use crate::gamedata;
-use crate::playerattackdata;
-use crate::monsterattackdata;
+use crate::attackdata;
 use crate::helpers;
 use std::collections::HashMap;
 use gamedata::*;
-use playerattackdata::*;
-use monsterattackdata::*;
+use attackdata::*;
 use helpers::*;
 
 pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap<MonsterList, Monster>) -> (Player, bool) {
@@ -26,8 +24,8 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
     let mut monsterfightdata = monsterdata.get(&monster).unwrap().clone();
     let mut playerfightdata = player;
     let mut playerturn = !monsterfightdata.initiative;
-    let mut phealingchannels = vec![0, 0, 0, 0];
-    let mut mhealingchannels = vec![0, 0, 0, 0];
+    let mut phealingchannels = vec![0, 0, 0, 0, 0, 0, 0, 0];
+    let mut mhealingchannels = vec![0, 0, 0, 0, 0, 0, 0, 0];
 
     if monsterfightdata.trail >= playerfightdata.level {
         monsterfightdata.level = 1;
@@ -59,10 +57,7 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
                     Passive::None => {
 
                     }
-                    _ => {
-                        eprintln!("E-001; Either this passive ability doesn't exist (wrong naming, mangled) or you forgot to implement one here. Status: {:?}", playerfightdata.passive);
-                        std::process::exit(1);
-                    }
+                    _ => {}
                 }
 
                 // Action Loop
@@ -93,7 +88,7 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
 
                             match idx {
                                 1 | 2 | 3 | 4 => {
-                                    let dmg = (attacksforplayer[idx as usize - 1])(&playerfightdata, &monsterfightdata);
+                                    let dmg = (attacksforplayer[idx as usize - 1])(&playerfightdata, &monsterfightdata, playerturn);
                                     println!("{} did {} damage to {}!", playerfightdata.name, dmg.0, monsterfightdata.name);
                                     monsterfightdata.hp -= dmg.0;
                                     println!("{} has {} HP left!", monsterfightdata.name, monsterfightdata.hp);
@@ -106,10 +101,7 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
                                         Passive::None => {
 
                                         }
-                                        _ => {
-                                            eprintln!("E-001; Either this passive ability doesn't exist (wrong naming, mangled) or you forgot to implement one here. Status: {:?}", monsterfightdata.passive);
-                                            std::process::exit(1);
-                                        }
+                                        _ => {}
                                     }
 
                                     playerturn = false;
@@ -212,10 +204,7 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
                                 Passive::None => {
 
                                 }
-                                _ => {
-                                    eprintln!("E-001; Either this passive ability doesn't exist (wrong naming, mangled) or you forgot to implement one here. Status: {:?}", playerfightdata.passive);
-                                    std::process::exit(1);
-                                }
+                                _ => {}
                             }
                             playerturn = false;
                         }
@@ -234,10 +223,7 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
                         Passive::None => {
 
                         }
-                        _ => {
-                            eprintln!("E-001; Either this passive ability doesn't exist (wrong naming, mangled) or you forgot to implement one here. Status: {:?}", playerfightdata.passive);
-                            std::process::exit(1);
-                        }
+                        _ => {}
                     }
 
                     if playerturn == false {
@@ -277,7 +263,7 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
 
                     match attackindex {
                         0 | 1 | 2 | 3 => {
-                            let dmg = (attacksformonster[attackindex as usize])(&monsterfightdata, &playerfightdata);
+                            let dmg = (attacksformonster[attackindex as usize])(&playerfightdata, &monsterfightdata, playerturn);
                             println!("{} did {} damage to {}!", monsterfightdata.name, dmg.0, playerfightdata.name);
                             playerfightdata.hp -= dmg.0;
                             println!("{} has {} HP left!", playerfightdata.name, playerfightdata.hp);
@@ -290,10 +276,7 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
                                 Passive::None => {
 
                                 }
-                                _ => {
-                                    eprintln!("E-001; Either this passive ability doesn't exist (wrong naming, mangled) or you forgot to implement one here. Status: {:?}", playerfightdata.passive);
-                                    std::process::exit(1);
-                                }
+                                _ => {}
                             }
 
                             playerturn = true;
@@ -310,10 +293,7 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
                         Passive::None => {
 
                         }
-                        _ => {
-                            eprintln!("E-001; Either this passive ability doesn't exist (wrong naming, mangled) or you forgot to implement one here. Status: {:?}", monsterfightdata.passive);
-                            std::process::exit(1);
-                        }
+                        _ => {}
                     }
 
                     if playerturn == true {
