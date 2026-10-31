@@ -76,6 +76,30 @@ pub struct Room {
 #[derive(Debug, Hash, Eq, PartialEq, Clone, Copy)]
 pub enum Type {
     Normal,
+    Zombie,
+    Dragon,
+    Dinosaur,
+    Bird,
+    Fire,
+    Earth,
+    Air,
+    Water,
+    Plant,
+    Light,
+    Dark,
+    Psychic,
+    Fairy,
+    Divine,
+    Thessal,
+    Ghost,
+    Metal,
+    Temporal,
+    Magic,
+    Holy,
+    Unholy,
+    Toxic,
+    Chaotic,
+    Uncanny
 }
 
 #[derive(Debug, Hash, Eq, PartialEq, Clone, Copy)]

@@ -29,6 +29,22 @@ pub fn hv() {
 }
 
 pub fn dice(x: u64, s: u64) -> u64 {
-    let numberthing = (SystemTime::now().duration_since(UNIX_EPOCH).expect("Time went backwards").as_nanos() as u64).wrapping_mul(s);
-    return (numberthing % x) + 1;
+    let numberthing = (SystemTime::now().duration_since(UNIX_EPOCH).expect("Time went backwards").as_micros() as u64).wrapping_mul(s);
+
+    let mut z = numberthing.wrapping_mul(s);
+    z ^= z >> 30;
+    z = z.wrapping_mul(0xbf58476d1ce4e5b9);
+    z ^= z >> 27;
+    z = z.wrapping_mul(0x94d049bb133111eb);
+    z ^= z >> 31;
+
+    return (z % x) + 1;
+}
+
+pub fn salt(s: u64, ogs: u64) -> u64 {
+    let mut z = s.wrapping_mul(ogs);
+    z = z.wrapping_add(0x9e3779b97f4a7c15);
+    z = (z ^ (z >> 30)).wrapping_mul(0xbf58476d1ce4e5b9);
+    z = (z ^ (z >> 27)).wrapping_mul(0x94d049bb133111eb);
+    return z ^ (z >> 31);
 }

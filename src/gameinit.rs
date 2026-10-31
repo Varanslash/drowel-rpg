@@ -52,6 +52,21 @@ fn main() {
     // a is total mental (so like schizoprenia)
     // these do not improve with level, you are literally stuck with these
 
+    let typings: HashMap<Class, Type> = HashMap::from([
+        (Class::Fighter, Type::Normal),
+        (Class::Wizard, Type::Magic),
+        (Class::Bishop, Type::Holy),
+        (Class::Paladin, Type::Light),
+        (Class::Barbarian, Type::Dragon),
+        (Class::Bard, Type::Fairy),
+        (Class::Druid, Type::Plant),
+        (Class::Knight, Type::Metal),
+        (Class::Rogue, Type::Dark),
+        (Class::Amazoness, Type::Earth),
+        (Class::Psychic, Type::Psychic),
+        (Class::Warlock, Type::Unholy),
+    ]);
+
     let char_points = budgetforstats;
     println!("
        █▀▄▄▄█▀                                                               ▄▄▄▀▀▀█
@@ -195,6 +210,7 @@ fn main() {
 
     let attackformulas = attacklist.get(&class).unwrap();
     let healtimes = healtiming.get(&class).unwrap();
+    let typing = typings.get(&class).unwrap();
 
     let player = Player {
         strength: strength,
@@ -208,7 +224,7 @@ fn main() {
         hp: 40,
         maxhp: 40,
         class: class,
-        ptype: Type::Normal,
+        ptype: *typing,
         attack_formula: attackformulas[0],
         attack_formula_2: attackformulas[1],
         attack_formula_3: attackformulas[2],
