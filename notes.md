@@ -177,3 +177,86 @@ The Cathedral, God's Village -> Aeternus
 Yahweh's Castle -> Path
 Desert -> Mindscape
 Sardor -> Sardor Castle
+
+attacks:
+- Vaticano - Bishop L20
+- Ancient Power - Druid L20
+- Dragon's Power - Barbarian L20
+- Psychic - Psychic L20
+- Ultimatum - Fighter L20
+- Judgement - Paladin L20
+- Arcanoid - Wizard L20
+- Green Bullet - Rogue L20
+- Space Jump - Knight L20, player only
+- Necrosis - Warlock L20
+- Matriarch's Game - Amazoness L20, player only
+- Simulacrum Game - Bard L20
+- Ordination - Bishop L1, player only
+- Lotus Petal - Druid L1
+- Fury - Barbarian L1
+- Psyshock - Psychic L1
+- Gold Bullet - Fighter L1
+- Divination - Paladin L1, player only
+- Gale Force - Wizard L1
++ Extremespeed - Rogue L1
+- Lambda Jump - Knight L1, player only
+- Cursed Seal - Warlock L1
+- Princess's Game - Amazoness L1, player only
+- Dissonance - Bard L1
+- Red Bullet
+- Frost
+- Holdover
+- Hook Kick
+- Side Kick
+- Tackle
+- Rush
+- Reckless
+- Influence
+- Retribution
++ Body Slam
+- Ember
+- Hinotama
+- Glass Chapel
+- Strength
+- Ice Punch
+- Ice Missile
+- Overgrown
+- Pacify
+- Thunder
+- Cardinal Punch
+- Aurora Beam
+- Australis
+- Headhunter
+- Wonder Flash
+- Bishop's Game - player only
+- Fast Attack
+- Cut
+- Desert Game
+- Dragonbreath
+- Rock Throw
+- Riptide
+- Gust
+- Venom Fang
+- Shadow Claw
+- Spore Cloud
+- Spear Thrust
+- Gloom
+- Backstab - player only
+- Hamstring - player only
++ Disintegrate - monsters only
+- Bite - monsters only
+- Claw - monsters only
+- Gore - monsters only
+- Stomp - monsters only
+- Tail Swipe - monsters only
+- Talon - monsters only
+- Grave Touch - monsters only
+- Quake - monsters only
+- Shield Bash
+- Brine Spray
+- Pixie Dust
+- Sunbeam
+- Wing Slash
+- Sunder
+- Daze
++ NaNAttack

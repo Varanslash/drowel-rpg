@@ -27,6 +27,8 @@ data:
 + fill item enum
 + fill status enum
 + fill area enum
+- fill type enum
+- make class dependent types work in init
 - make player attacks (24 specific class, 36 general)
 - make monster attacks (60)
 - fill credits
@@ -43,18 +45,18 @@ data:
 - write a story
 - make a game
 
-optional:
+drowel redesign:
+- relatively advanced monster ai
+- trigger command for battle
+- class based starting items
 - save and load
+
+optional:
 - room boolflags
 - kill command (kills an npc)
 - home bases
 - bauthic for some characters
 - talking during battle (saves your turn)
-- relatively advanced monster ai
-- elemental tag/weakness/resistance system
-- invoke command for battle (casts a spell)
-- trigger command for battle
-- class based starting items
 - healing time improvements
 - super cool minigames
 
