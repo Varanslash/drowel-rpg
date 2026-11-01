@@ -1,4 +1,4 @@
-pub type Attack = fn(&Player, &Monster, bool) -> (i32, Status);
+pub type Attack = fn(Player, Monster, bool) -> (i32, Status, Player, Monster);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Monster {
@@ -51,7 +51,8 @@ pub struct Player {
     pub status: Status,
     pub healtimings: Vec<usize>,
     pub passive: Passive,
-    pub money: u64
+    pub money: u64,
+    pub tempmod: Vec<i32>
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -430,50 +431,50 @@ pub enum Item {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Copy)]
 pub enum Status {
-    HatCurse,
-    Poison,
-    Curse,
-    StrDrain,
-    DexDrain,
-    ConDrain,
-    IntDrain,
-    WisDrain,
-    ChaDrain,
-    MagicDrain,
-    Perishing,
-    DestinyBond,
-    Wither,
-    Frozen,
-    Distracted,
-    Burned,
-    Paralyzed,
-    Schizophrenic,
-    Confused,
-    Parasite,
+    HatCurse, // Blocked by Miracle
+    Poison, // Blocked by Infectious and Save
+    Curse, // Blocked by Miracle
+    StrDrain, // Blocked by Rage and Draconian
+    DexDrain, // Blocked by Initiative and Draconian
+    ConDrain, // Blocked by Save
+    IntDrain, // Blocked by Save
+    WisDrain, // Blocked by Stoic
+    ChaDrain, // Blocked by Miracle
+    MagicDrain, // Unblockable
+    Perishing, // Blocked by Miracle
+    DestinyBond, // Blocked by Divinity
+    Wither, // Blocked by Save and Mending
+    Frozen, // Blocked by Draconian and Regular
+    Distracted, // Blocked by Stoic
+    Burned, // Unblockable
+    Paralyzed, // Unblockable
+    Schizophrenic, // Blocked by Stoic and Miracle
+    Confused, // Blocked by Stoic
+    Parasite, // Blocked by Infectious
     None
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Copy)]
 pub enum Passive {
-    Mending,
-    Sturdy,
-    Extraspeed,
-    Extrapower,
-    Save,
-    Regular,
-    Miracle,
-    Greed,
-    Infectious,
-    Stoic,
-    Bipolar,
-    Thorns,
-    SavingThrow,
-    Draconian,
-    Rage,
-    Palladium,
-    Initiative,
-    MultiattackII,
-    MultiattackIII,
-    Divinity,
+    Mending, // heals CON/2 every turn
+    Sturdy, // nothing, pure blocking; also against certain attack, has resistances
+    Extraspeed, // increases dexterity by 1 every other turn
+    Extrapower, // same as extraspeed but for strength
+    Save, // just sturdy, but for physical deterioration
+    Regular, // sturdy, but for magical attacks
+    Miracle, // save, but magical
+    Greed, // multiplies money gain by 1.5 after every fight
+    Infectious, // protects against viruslike attacks and statuses, and has a 20% chance to infect opponent with Parasite every turn
+    Stoic, // blocks mental stat debuffs and has resistances against certain statuses
+    Bipolar, // 5% chance to give opponent schizo
+    Thorns, // chip damage to opponent when hit
+    SavingThrow, // 25% chance to recover some hp when hit
+    Draconian, // helps dragon types and resists other dragon attacks
+    Rage, // 25% chance to buff str by 2 every turn
+    Palladium, // 10% chance to induce wither every turn
+    Initiative, // 10% chance to get another turn
+    MultiattackII, // get 2 turns per turn, uses Channel 8
+    MultiattackIII, // get 2 turns per turn, uses Channel 8
+    Divinity, // For those without Divine, it turns you to a Divine type if triggered in exchange for 25% of your HP. If you are Divine and have this ability, you will do 1.2x damage every time you attack.
     None
 }

@@ -41,10 +41,15 @@ pub fn dice(x: u64, s: u64) -> u64 {
     return (z % x) + 1;
 }
 
-pub fn salt(s: u64, ogs: u64) -> u64 {
+pub fn salt(s: u64, ogs: u64, rounds: u32) -> u64 {
     let mut z = s.wrapping_mul(ogs);
-    z = z.wrapping_add(0x9e3779b97f4a7c15);
-    z = (z ^ (z >> 30)).wrapping_mul(0xbf58476d1ce4e5b9);
-    z = (z ^ (z >> 27)).wrapping_mul(0x94d049bb133111eb);
-    return z ^ (z >> 31);
+    
+    for _ in 0..rounds {
+        z = z.wrapping_add(0x9e3779b97f4a7c15);
+        z = (z ^ (z >> 30)).wrapping_mul(0xbf58476d1ce4e5b9);
+        z = (z ^ (z >> 27)).wrapping_mul(0x94d049bb133111eb);
+        z ^= z >> 31;
+    }
+    
+    return z;
 }

@@ -235,7 +235,8 @@ fn main() {
         status: Status::None,
         healtimings: healtimes.to_vec(),
         passive: Passive::None,
-        money: 0
+        money: 0,
+        tempmod: vec![0, 0, 0, 0, 0, 0]
     };
 
     let world = init();

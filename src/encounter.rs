@@ -13,12 +13,7 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
     // SystemTime::now().duration_since(UNIX_EPOCH).expect("Time went backwards").as_nanos();
     // might need this
 
-    let mut strmod = 0;
-    let mut dexmod = 0;
-    let mut conmod = 0;
-    let mut intmod = 0;
-    let mut wismod = 0;
-    let mut chamod = 0;
+    // State Setup
     let mut turncounter = 0;
     println!("{:?} has appeared!", monster);
     let mut monsterfightdata = monsterdata.get(&monster).unwrap().clone();
@@ -26,6 +21,11 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
     let mut playerturn = !monsterfightdata.initiative;
     let mut phealingchannels = vec![0, 0, 0, 0, 0, 0, 0, 0];
     let mut mhealingchannels = vec![0, 0, 0, 0, 0, 0, 0, 0];
+
+    // Saving snapshots of certain stats, such that attacks can modify them freely
+    let playerpassive = playerfightdata.passive;
+    let playertype = playerfightdata.ptype;
+    let playerclass = playerfightdata.class;
 
     if monsterfightdata.trail >= playerfightdata.level {
         monsterfightdata.level = 1;
@@ -88,7 +88,9 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
 
                             match idx {
                                 1 | 2 | 3 | 4 => {
-                                    let dmg = (attacksforplayer[idx as usize - 1])(&playerfightdata, &monsterfightdata, playerturn);
+                                    let dmg = (attacksforplayer[idx as usize - 1])(playerfightdata, monsterfightdata, playerturn);
+                                    playerfightdata = dmg.2;
+                                    monsterfightdata = dmg.3;
                                     println!("{} did {} damage to {}!", playerfightdata.name, dmg.0, monsterfightdata.name);
                                     monsterfightdata.hp -= dmg.0;
                                     println!("{} has {} HP left!", monsterfightdata.name, monsterfightdata.hp);
@@ -263,7 +265,9 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
 
                     match attackindex {
                         0 | 1 | 2 | 3 => {
-                            let dmg = (attacksformonster[attackindex as usize])(&playerfightdata, &monsterfightdata, playerturn);
+                            let dmg = (attacksformonster[attackindex as usize])(playerfightdata, monsterfightdata, playerturn);
+                            playerfightdata = dmg.2;
+                            monsterfightdata = dmg.3;
                             println!("{} did {} damage to {}!", monsterfightdata.name, dmg.0, playerfightdata.name);
                             playerfightdata.hp -= dmg.0;
                             println!("{} has {} HP left!", playerfightdata.name, playerfightdata.hp);
@@ -326,12 +330,16 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
         }
     }
 
-    playerfightdata.strength -= strmod;
-    playerfightdata.dexterity -= dexmod;
-    playerfightdata.constitution -= conmod;
-    playerfightdata.intelligence -= intmod;
-    playerfightdata.wisdom -= wismod;
-    playerfightdata.charisma -= chamod;
+    playerfightdata.strength -= playerfightdata.tempmod[0];
+    playerfightdata.dexterity -= playerfightdata.tempmod[1];
+    playerfightdata.constitution -= playerfightdata.tempmod[2];
+    playerfightdata.intelligence -= playerfightdata.tempmod[3];
+    playerfightdata.wisdom -= playerfightdata.tempmod[4];
+    playerfightdata.charisma -= playerfightdata.tempmod[5];
+    playerfightdata.tempmod = vec![0, 0, 0, 0, 0, 0];
+    playerfightdata.passive = playerpassive;
+    playerfightdata.ptype = playertype;
+    playerfightdata.class = playerclass;
 
     if playerfightdata.status != Status::HatCurse {
         playerfightdata.status = Status::None;
