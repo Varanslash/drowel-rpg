@@ -49,6 +49,10 @@ data:
 - write a story
 - make a game
 
+polishing:
+- remove "#!\[allow(dead_code)\]" from gameinit
+- review and fix warnings
+
 drowel redesign:
 - relatively advanced monster ai
 - trigger command for battle
@@ -59,7 +63,7 @@ optional:
 - room boolflags
 - kill command (kills an npc)
 - home bases
-- bauthic for some characters
+- bausha language family speech for some characters
 - talking during battle (saves your turn)
 - healing time improvements
 - super cool minigames
@@ -72,3 +76,7 @@ meta:
 
 optional meta:
 - bauthic dictionary
+- draconian dictionary
+- proto-bauthic dictionary
+- celestian dictionary
+- rare tongue dictionary

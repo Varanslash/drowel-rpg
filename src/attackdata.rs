@@ -8,16 +8,32 @@ pub fn nanattack(stat: Player, mstat: Monster, caster: bool) -> (i32, Status, Pl
 }
 
 pub fn disintegrate(stat: Player, mstat: Monster, caster: bool) -> (i32, Status, Player, Monster) {
-    if stat.passive != Passive::Sturdy {
-        if stat.keys.contains(&Item::ItemOfPro) || stat.keys.contains(&Item::ItemOfWard) || stat.keys.contains(&Item::ItemOfIdem) {
-            return (10, Status::Wither, stat, mstat);
+    if caster {
+        if mstat.passive != Passive::Sturdy {
+            if mstat.keys.contains(&Item::ItemOfPro) || mstat.keys.contains(&Item::ItemOfWard) || mstat.keys.contains(&Item::ItemOfIdem) || mstat.mtype == Type::Divine || mstat.mtype == Type::Uncanny {
+                return (10, Status::Wither, stat, mstat);
+            }
+            else {
+                return (3900000, Status::None, stat, mstat);
+            }
         }
         else {
-            return (3900000, Status::None, stat, mstat);
+            return (10, Status::Wither, stat, mstat);
         }
     }
+
     else {
-        return (10, Status::Wither, stat, mstat);
+        if stat.passive != Passive::Sturdy {
+            if stat.keys.contains(&Item::ItemOfPro) || stat.keys.contains(&Item::ItemOfWard) || stat.keys.contains(&Item::ItemOfIdem) || stat.ptype == Type::Divine || stat.ptype == Type::Uncanny {
+                return (10, Status::Wither, stat, mstat);
+            }
+            else {
+                return (3900000, Status::None, stat, mstat);
+            }
+        }
+        else {
+            return (10, Status::Wither, stat, mstat);
+        }
     }
 }
 
@@ -31,9 +47,9 @@ pub fn extremespeed(stat: Player, mstat: Monster, caster: bool) -> (i32, Status,
 
     let mut ogsalt = 11400714819323198485;
     let mut salt = 11400714819323198485;
-    let weakness = vec![Type::Zombie, Type::Bird, Type::Psychic, Type::Fairy];
-    let resist = vec![Type::Dragon, Type::Earth, Type::Metal];
-    let immune = vec![Type::Ghost];
+    let weakness = [Type::Zombie, Type::Bird, Type::Psychic, Type::Fairy];
+    let resist = [Type::Dragon, Type::Earth, Type::Metal];
+    let immune = [Type::Ghost];
 
     let casdex = match caster {
         true => {
@@ -131,8 +147,19 @@ pub fn bodyslam(stat: Player, mstat: Monster, caster: bool) -> (i32, Status, Pla
 }
 
 pub fn dragonbreath(stat: Player, mstat: Monster, caster: bool) -> (i32, Status, Player, Monster) {
+    /*
+        ~ Dragonbreath
+        - types: weak Dragon | resist Metal | immune Fairy
+        - passives: resist Draconian
+        - monsters: weak BabyDragon, DeepDragon, Dragon, RoseDragon, AncientDragon, GoldDragon, BauthicDragon, DeltaDragon, WeddingDragon, Thessaldragon | resist Golem, GoldGeneral, Rook, Talos | immune Sprite, Leprechaun
+    */
+
     let mut ogsalt = 11400714819323198485;
     let mut salt = 11400714819323198485;
+    let weakness = [Type::Dragon];
+    let resist = [Type::Metal];
+    let immune = [Type::Fairy];
+    let presist = [Passive::Draconian];
 
     let level = match caster {
         true => {
@@ -140,6 +167,24 @@ pub fn dragonbreath(stat: Player, mstat: Monster, caster: bool) -> (i32, Status,
         }
         _ => {
             mstat.level * 2
+        }
+    };
+
+    let optype = match !caster {
+        true => {
+            stat.ptype
+        }
+        _ => {
+            mstat.mtype
+        }
+    };
+
+    let oppassive = match !caster {
+        true => {
+            stat.passive
+        }
+        _ => {
+            mstat.passive
         }
     };
 
@@ -156,7 +201,7 @@ pub fn dragonbreath(stat: Player, mstat: Monster, caster: bool) -> (i32, Status,
 
     salt = helpers::salt(salt, ogsalt, 1);
 
-    let status = match helpers::dice(100, salt) {
+    let mut status = match helpers::dice(100, salt) {
         1..=5 => {
             Status::Frozen
         }
@@ -171,11 +216,74 @@ pub fn dragonbreath(stat: Player, mstat: Monster, caster: bool) -> (i32, Status,
         }
     };
 
-    return (level + modifier, status, stat, mstat)
+    let mut damage = level + modifier;
+
+    if weakness.contains(&optype) {
+        damage *= 2;
+        status = Status::Frozen
+    }
+
+    if resist.contains(&optype) || presist.contains(&oppassive) {
+        damage = damage / 2;
+        status = Status::None
+    }
+
+    if immune.contains(&optype) {
+        damage = 0;
+        status = Status::None
+    }
+
+    return (damage, status, stat, mstat)
 }
 
 pub fn frost(stat: Player, mstat: Monster, caster: bool) -> (i32, Status, Player, Monster) {
-    return (0, Status::Frozen, stat, mstat)
+    /*
+        ~ Frost
+        - types: weak Dragon, Dinosaur, Bird, Earth, Plant | resist Fire, Water, Metal
+        - passives: resist Regular
+        - monsters: weak BabyDragon, Harpy, Raptor, Dragon, Gargoyle, Hawk, RoseDragon | resist Imp, Slime, WillOWisp, Rook | immune IceKirin
+    */
+
+    let optype = match !caster {
+        true => {
+            stat.ptype
+        }
+        _ => {
+            mstat.mtype
+        }
+    };
+
+    let oppassive = match !caster {
+        true => {
+            stat.passive
+        }
+        _ => {
+            mstat.passive
+        }
+    };
+
+    let mut damage = 0;
+    let mut status = Status::None;
+    
+    let weakness = [Type::Dragon, Type::Dinosaur, Type::Bird, Type::Earth, Type::Plant];
+    let resist = [Type::Metal, Type::Fire, Type::Water];
+    let presist = [Passive::Regular];
+
+    if weakness.contains(&optype) {
+        damage = 20;
+        status = Status::Frozen
+    }
+
+    if resist.contains(&optype) || presist.contains(&oppassive) {
+        match helpers::dice(50, helpers::salt(11400714819323198485, 11400714819323198485, 1)) % 2 {
+            0 => {
+                status = Status::Frozen
+            }
+            _ => {}
+        }
+    }
+
+    return (damage, status, stat, mstat)
 }
 
 pub fn influence(stat: Player, mstat: Monster, caster: bool) -> (i32, Status, Player, Monster) {

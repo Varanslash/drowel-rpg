@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 mod game;
 mod gamedata;
 mod attackdata;

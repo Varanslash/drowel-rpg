@@ -268,7 +268,7 @@ attacks:
   - passives: resist Stoic
   - monsters: weak Goblin, Orc, Wolf, Raptor, Troll, Ogre, Minotaur | resist Leprechaun, Dreamling, Sphinx, Warlock, Dream, Mindflower | immune Zombie, Skeleton, Withered, Perished, Golem
 
-~ Dragonbreath
++ Dragonbreath
   - types: weak Dragon | resist Metal | immune Fairy
   - passives: resist Draconian
   - monsters: weak BabyDragon, DeepDragon, Dragon, RoseDragon, AncientDragon, GoldDragon, BauthicDragon, DeltaDragon, WeddingDragon, Thessaldragon | resist Golem, GoldGeneral, Rook, Talos | immune Sprite, Leprechaun
