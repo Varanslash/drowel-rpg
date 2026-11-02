@@ -128,7 +128,7 @@ attacks:
   - passives: none
   - monsters: weak BabyDragon, Harpy, MushroomMan, Raptor, Dragon, Hawk, RoseDragon | resist Zombie, Skeleton, Golem, Rook, Talos | immune Ghost, Banshee, Poltergeist
 
-~ Frost
++ Frost
   - types: weak Dragon, Dinosaur, Bird, Earth, Plant | resist Fire, Water, Metal
   - passives: resist Regular
   - monsters: weak BabyDragon, Harpy, Raptor, Dragon, Gargoyle, Hawk, RoseDragon | resist Imp, Slime, WillOWisp, Rook | immune IceKirin

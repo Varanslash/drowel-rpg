@@ -3,6 +3,78 @@ use crate::helpers;
 use gamedata::*;
 use helpers::*;
 
+/*
+    let weakness = [Type::Normal, Type::Dinosaur, Type::Toxic];
+    let resist = [Type::Dark, Type::Psychic, Type::Metal, Type::Uncanny];
+    let immune = [Type::Zombie];
+    let pweakness = [Passive::Bipolar];
+    let presist = [Passive::Regular, Passive::Stoic];
+    let pimmune = [];
+
+    let dmg = match caster {
+        true => {
+            (stat.intelligence * 2)
+        }
+        _ => {
+            (mstat.intelligence * 2)
+        }
+    };
+
+    let optype = match !caster {
+        true => {
+            stat.ptype
+        }
+        _ => {
+            mstat.mtype
+        }
+    };
+
+    let oppassive = match !caster {
+        true => {
+            stat.passive
+        }
+        _ => {
+            mstat.passive
+        }
+    };
+
+    let modifier = match helpers::dice(50, salt) % 2 {
+        0 => {
+            salt = helpers::salt(salt, ogsalt, 1);
+            helpers::dice(4, salt) as i32
+        }
+        _ => {
+            salt = helpers::salt(salt, ogsalt, 1);
+            -(helpers::dice(4, salt) as i32)
+        }
+    };
+
+    let mut status = Status::Schizophrenic;
+    let mut nstatus = Status::None;
+    let mut damage = dmg+modifier;
+    let mut sdamage = 0;
+
+    if weakness.contains(&optype) || pweakness.contains(&oppassive) {
+        sdamage = damage;
+        status = Status::Schizophrenic;
+        nstatus = Status::Schizophrenic;
+    }
+
+    if resist.contains(&optype) || presist.contains(&oppassive) {
+        damage = damage / 2;
+        status = Status::None
+    }
+
+    if immune.contains(&optype) || pimmune.contains(&oppassive) {
+        damage = 0;
+        status = Status::None
+    }
+
+    kristine
+
+    these will all be very helpful for you
+*/
+
 pub fn nanattack(stat: Player, mstat: Monster, caster: bool) -> (i32, Status, Player, Monster) {
     return (1, Status::None, stat, mstat);
 }
@@ -287,9 +359,22 @@ pub fn frost(stat: Player, mstat: Monster, caster: bool) -> (i32, Status, Player
 }
 
 pub fn influence(stat: Player, mstat: Monster, caster: bool) -> (i32, Status, Player, Monster) {
+    /* 
+        ~ Influence
+        - types: weak Normal, Dinosaur, Toxic | resist Dark, Psychic, Metal, Uncanny | immune Zombie
+        - passives: weak Bipolar | resist Regular, Stoic
+        - monsters: weak Goblin, Orc, Cyclops, Wolf, Raptor, Troll, Ogre, Minotaur | resist Dreamling, Sphinx, Rook, EntityOfInfluence, Dream, Mindflower | immune Zombie, Skeleton, Withered, Perished, Golem
+    */
+
     let mut ogsalt = 11400714819323198485;
     let mut salt = 11400714819323198485;
     salt = helpers::salt(salt, ogsalt, 2);
+    let weakness = [Type::Normal, Type::Dinosaur, Type::Toxic];
+    let resist = [Type::Dark, Type::Psychic, Type::Metal, Type::Uncanny];
+    let immune = [Type::Zombie];
+    let pweakness = [Passive::Bipolar];
+    let presist = [Passive::Regular, Passive::Stoic];
+    let pimmune = [];
 
     let dmg = match caster {
         true => {
@@ -297,6 +382,24 @@ pub fn influence(stat: Player, mstat: Monster, caster: bool) -> (i32, Status, Pl
         }
         _ => {
             (mstat.intelligence * 2)
+        }
+    };
+
+    let optype = match !caster {
+        true => {
+            stat.ptype
+        }
+        _ => {
+            mstat.mtype
+        }
+    };
+
+    let oppassive = match !caster {
+        true => {
+            stat.passive
+        }
+        _ => {
+            mstat.passive
         }
     };
 
@@ -313,12 +416,45 @@ pub fn influence(stat: Player, mstat: Monster, caster: bool) -> (i32, Status, Pl
 
     salt = helpers::salt(salt, ogsalt, 1);
 
+    let mut status = Status::Schizophrenic;
+    let mut nstatus = Status::None;
+    let mut damage = dmg+modifier;
+    let mut sdamage = 0;
+
+    if weakness.contains(&optype) || pweakness.contains(&oppassive) {
+        match helpers::dice(50, salt) % 2 {
+            0 => {
+                salt = helpers::salt(salt, ogsalt, 1);
+                sdamage = damage;
+                damage *= 2;
+            }
+            _ => {
+                salt = helpers::salt(salt, ogsalt, 1);
+                nstatus = Status::Schizophrenic
+            }
+        }
+    }
+
+    if resist.contains(&optype) || presist.contains(&oppassive) {
+        damage = damage / 2;
+        nstatus = Status::None
+    }
+
+    if immune.contains(&optype) || pimmune.contains(&oppassive) {
+        damage = 0;
+        sdamage = 0;
+        status = Status::None;
+        nstatus = Status::None;
+    }
+
+    salt = helpers::salt(salt, ogsalt, 1);
+
     match helpers::dice(4, salt) {
         4 => {
-            return (0, Status::Schizophrenic, stat, mstat)
+            return (sdamage as i32, status, stat, mstat)
         }
         _ => {
-            return (dmg+modifier as i32, Status::None, stat, mstat)
+            return (damage as i32, nstatus, stat, mstat)
         }
     }
 }

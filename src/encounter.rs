@@ -88,10 +88,21 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
 
                             match idx {
                                 1 | 2 | 3 | 4 => {
-                                    let dmg = (attacksforplayer[idx as usize - 1])(playerfightdata, monsterfightdata, playerturn);
+                                    let mut dmg = (attacksforplayer[idx as usize - 1])(playerfightdata, monsterfightdata, playerturn);
                                     playerfightdata = dmg.2;
                                     monsterfightdata = dmg.3;
-                                    println!("{} did {} damage to {}!", playerfightdata.name, dmg.0, monsterfightdata.name);
+
+                                    match playerfightdata.status {
+                                        Status::Schizophrenic => {
+                                            dmg.0 = 0;
+                                            dmg.1 = Status::None;
+                                            println!("{} missed due to schizophrenia!", playerfightdata.name)
+                                        }
+                                        _ => {
+                                            println!("{} did {} damage to {}!", playerfightdata.name, dmg.0, monsterfightdata.name);
+                                        }
+                                    }
+
                                     monsterfightdata.hp -= dmg.0;
                                     println!("{} has {} HP left!", monsterfightdata.name, monsterfightdata.hp);
                                     if dmg.1 != Status::None {
@@ -265,9 +276,19 @@ pub fn encounter(player: Player, mut monster: MonsterList, monsterdata: &HashMap
 
                     match attackindex {
                         0 | 1 | 2 | 3 => {
-                            let dmg = (attacksformonster[attackindex as usize])(playerfightdata, monsterfightdata, playerturn);
+                            let mut dmg = (attacksformonster[attackindex as usize])(playerfightdata, monsterfightdata, playerturn);
                             playerfightdata = dmg.2;
                             monsterfightdata = dmg.3;
+                            match playerfightdata.status {
+                                Status::Schizophrenic => {
+                                    dmg.0 = 0;
+                                    dmg.1 = Status::None
+                                }
+                                _ => {
+                                    
+                                }
+                            }
+
                             println!("{} did {} damage to {}!", monsterfightdata.name, dmg.0, playerfightdata.name);
                             playerfightdata.hp -= dmg.0;
                             println!("{} has {} HP left!", playerfightdata.name, playerfightdata.hp);
