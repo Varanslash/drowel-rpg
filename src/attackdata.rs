@@ -4,12 +4,17 @@ use gamedata::*;
 use helpers::*;
 
 /*
-    let weakness = [Type::Normal, Type::Dinosaur, Type::Toxic];
-    let resist = [Type::Dark, Type::Psychic, Type::Metal, Type::Uncanny];
-    let immune = [Type::Zombie];
-    let pweakness = [Passive::Bipolar];
-    let presist = [Passive::Regular, Passive::Stoic];
-    let pimmune = [];
+    let mut ogsalt = 11400714819323198485;
+    let mut salt = 11400714819323198485;
+    let weakness = [Type::Zombie, Type::Dark, Type::Ghost, Type::Unholy, Type::Chaotic, Type::Uncanny];
+    let resist = [Type::Light, Type::Divine, Type::Holy];
+    let immune = [];
+    let pweakness = [];
+    let presist = [Passive::Regular];
+    let pimmune = [Passive::Sturdy];
+    let op = helpers::typepasfetch(&stat, &mstat, caster);
+    let optype = op.0;
+    let oppassive = op.1;
 
     let dmg = match caster {
         true => {
@@ -55,20 +60,18 @@ use helpers::*;
     let mut sdamage = 0;
 
     if weakness.contains(&optype) || pweakness.contains(&oppassive) {
-        sdamage = damage;
-        status = Status::Schizophrenic;
-        nstatus = Status::Schizophrenic;
+
     }
 
     if resist.contains(&optype) || presist.contains(&oppassive) {
-        damage = damage / 2;
-        status = Status::None
+
     }
 
     if immune.contains(&optype) || pimmune.contains(&oppassive) {
-        damage = 0;
-        status = Status::None
+
     }
+
+    (mut stat: Player, mut mstat: Monster, caster: bool) -> (i32, Status, Player, Monster)
 
     kristine
 
@@ -179,8 +182,21 @@ pub fn extremespeed(stat: Player, mstat: Monster, caster: bool) -> (i32, Status,
 }
 
 pub fn bodyslam(stat: Player, mstat: Monster, caster: bool) -> (i32, Status, Player, Monster) {
+
+    /* 
+        ~ Body Slam
+        - types: weak Zombie, Bird, Psychic, Fairy | resist Dragon, Earth, Metal | immune Ghost
+        - passives: resist Sturdy
+    */
+
     let mut ogsalt = 11400714819323198485;
     let mut salt = 11400714819323198485;
+    let weakness = [Type::Zombie, Type::Bird, Type::Psychic, Type::Fairy];
+    let resist = [Type::Dragon, Type::Earth, Type::Metal];
+    let immune = [Type::Ghost];
+    let pweakness = [];
+    let presist = [Passive::Sturdy];
+    let pimmune = [];
 
     let strength = match caster {
         true => {
@@ -188,6 +204,33 @@ pub fn bodyslam(stat: Player, mstat: Monster, caster: bool) -> (i32, Status, Pla
         }
         _ => {
             mstat.strength
+        }
+    };
+
+    let level = match caster {
+        true => {
+            stat.level
+        }
+        _ => {
+            mstat.level
+        }
+    };
+
+    let optype = match !caster {
+        true => {
+            stat.ptype
+        }
+        _ => {
+            mstat.mtype
+        }
+    };
+
+    let oppassive = match !caster {
+        true => {
+            stat.passive
+        }
+        _ => {
+            mstat.passive
         }
     };
 
@@ -205,17 +248,29 @@ pub fn bodyslam(stat: Player, mstat: Monster, caster: bool) -> (i32, Status, Pla
 
     salt = helpers::salt(salt, ogsalt, 1);
 
-    let statret = match helpers::dice(50, salt) < 11 {
+    let mut statret = match helpers::dice(50, salt) < 11 {
         true => {
             Status::Paralyzed
         }
         _ => Status::None
     };
 
+    let mut damage = (strength + (modifier as i32)) + (level);
     
-    salt = helpers::salt(salt, ogsalt, 1);
+    if weakness.contains(&optype) || pweakness.contains(&oppassive) {
+        damage *= 2;
+    }
 
-    return ((strength + (modifier as i32)), statret, stat, mstat)
+    if resist.contains(&optype) || presist.contains(&oppassive) {
+        damage = damage / 2;
+    }
+
+    if immune.contains(&optype) || pimmune.contains(&oppassive) {
+        damage = 0;
+        statret = Status::None
+    }
+
+    return (damage, statret, stat, mstat)
 }
 
 pub fn dragonbreath(stat: Player, mstat: Monster, caster: bool) -> (i32, Status, Player, Monster) {
@@ -378,10 +433,10 @@ pub fn influence(stat: Player, mstat: Monster, caster: bool) -> (i32, Status, Pl
 
     let dmg = match caster {
         true => {
-            (stat.intelligence * 2)
+            (stat.intelligence as f32 * 1.5) as i32
         }
         _ => {
-            (mstat.intelligence * 2)
+            (mstat.intelligence as f32 * 1.5) as i32
         }
     };
 
@@ -460,9 +515,21 @@ pub fn influence(stat: Player, mstat: Monster, caster: bool) -> (i32, Status, Pl
 }
 
 pub fn reckless(mut stat: Player, mut mstat: Monster, caster: bool) -> (i32, Status, Player, Monster) {
+    /* 
+        ~ Reckless
+        - types: weak Zombie, Bird, Psychic, Fairy | resist Dragon, Earth, Metal | immune Ghost
+        - passives: resist Sturdy
+    */
+
     let mut ogsalt = 11400714819323198485;
     let mut salt = 11400714819323198485;
     salt = helpers::salt(salt, ogsalt, 1);
+    let weakness = [Type::Zombie, Type::Bird, Type::Psychic, Type::Fairy];
+    let resist = [Type::Dragon, Type::Earth, Type::Metal];
+    let immune = [Type::Ghost];
+    let pweakness = [];
+    let presist = [Passive::Sturdy];
+    let pimmune = [];
 
     let dmg = match caster {
         true => {
@@ -479,6 +546,24 @@ pub fn reckless(mut stat: Player, mut mstat: Monster, caster: bool) -> (i32, Sta
         }
         _ => {
             mstat.dexterity
+        }
+    };
+
+    let optype = match !caster {
+        true => {
+            stat.ptype
+        }
+        _ => {
+            mstat.mtype
+        }
+    };
+
+    let oppassive = match !caster {
+        true => {
+            stat.passive
+        }
+        _ => {
+            mstat.passive
         }
     };
 
@@ -505,22 +590,467 @@ pub fn reckless(mut stat: Player, mut mstat: Monster, caster: bool) -> (i32, Sta
         }
     }
 
-    if caster {
-        if mstat.mtype == Type::Ghost {
-            damage = 0
-        }
-        else if mstat.mtype == Type::Dragon || mstat.mtype == Type::Metal {
-            damage = damage / 2
-        }
+    damage = damage / 2;
+
+    if weakness.contains(&optype) || pweakness.contains(&oppassive) {
+        damage *= 2
     }
-    else {
-        if stat.ptype == Type::Ghost {
-            damage = 0
+
+    if resist.contains(&optype) || presist.contains(&oppassive) {
+        damage /= 2
+    }
+
+    if immune.contains(&optype) || pimmune.contains(&oppassive) {
+        damage = 0
+    }
+
+    return (damage as i32, Status::None, stat, mstat)
+}
+
+pub fn vaticano(mut stat: Player, mut mstat: Monster, caster: bool) -> (i32, Status, Player, Monster) {
+    /* 
+        ~ Vaticano - Bishop L20
+        - types: weak Zombie, Dark, Ghost, Unholy, Chaotic, Uncanny | resist Light, Divine, Holy
+        - passives: resist Regular | immune Sturdy
+    */
+
+    let mut ogsalt = 11400714819323198485;
+    let mut salt = 11400714819323198485;
+    let weakness = [Type::Zombie, Type::Dark, Type::Ghost, Type::Unholy, Type::Chaotic, Type::Uncanny];
+    let resist = [Type::Light, Type::Divine, Type::Holy];
+    let immune = [];
+    let pweakness = [];
+    let presist = [Passive::Regular];
+    let pimmune = [Passive::Sturdy];
+    let op = helpers::typepasfetch(&stat, &mstat, caster);
+    let optype = op.0;
+    let oppassive = op.1;
+
+    let mut dmg = match caster {
+        true => {
+            (stat.intelligence * 2)
         }
-        else if stat.ptype == Type::Dragon || stat.ptype == Type::Metal {
-            damage = damage / 2
+        _ => {
+            (mstat.intelligence * 2)
+        }
+    };
+
+    let mut status = Status::None;
+
+    if weakness.contains(&optype) || pweakness.contains(&oppassive) {
+        status = Status::Perishing;
+    }
+
+    if resist.contains(&optype) || presist.contains(&oppassive) {
+        dmg /= 2;
+    }
+
+    if immune.contains(&optype) || pimmune.contains(&oppassive) {
+        dmg = 0;
+    }
+
+    return (dmg, status, stat, mstat)
+}
+
+pub fn ancientpower(mut stat: Player, mut mstat: Monster, caster: bool) -> (i32, Status, Player, Monster) {
+    /* 
+        ~ Ancient Power - Druid L20
+        - types: weak Air, Water | resist Dragon, Plant, Metal, Toxic
+        - passives: none
+    */
+
+    let mut ogsalt = 11400714819323198485;
+    let mut salt = 11400714819323198485;
+    let weakness = [Type::Air, Type::Water];
+    let resist = [Type::Dragon, Type::Plant, Type::Metal, Type::Toxic];
+    let immune = [];
+    let pweakness = [];
+    let presist = [];
+    let pimmune = [];
+    let op = helpers::typepasfetch(&stat, &mstat, caster);
+    let optype = op.0;
+    let oppassive = op.1;
+
+    let mut damage = match helpers::dice(50, salt) % 2 {
+        0 => {
+            salt = helpers::salt(salt, ogsalt, 2);
+            40 + helpers::dice(15, salt) as i32
+        }
+        _ => {
+            salt = helpers::salt(salt, ogsalt, 2);
+            40 - helpers::dice(15, salt) as i32
+        }
+    };
+
+    if weakness.contains(&optype) || pweakness.contains(&oppassive) {
+        damage *= 2;
+    }
+
+    if resist.contains(&optype) || presist.contains(&oppassive) {
+        damage /= 2;
+    }
+
+    if immune.contains(&optype) || pimmune.contains(&oppassive) {
+        damage = 0;
+    }
+
+    return (damage, Status::None, stat, mstat)
+}
+
+pub fn dragonspower(mut stat: Player, mut mstat: Monster, caster: bool) -> (i32, Status, Player, Monster) {
+    /* 
+        ~ Dragon's Power - Barbarian L20
+        - types: weak Zombie, Bird, Psychic | resist Earth, Metal | immune Fairy, Ghost
+        - passives: resist Sturdy, Draconian
+    */
+
+    let mut ogsalt = 11400714819323198485;
+    let mut salt = 11400714819323198485;
+    let weakness = [Type::Zombie, Type::Bird, Type::Psychic];
+    let resist = [Type::Earth, Type::Metal];
+    let immune = [Type::Fairy, Type::Ghost];
+    let pweakness: [Passive; 0] = [];
+    let presist = [Passive::Draconian, Passive::Sturdy];
+    let pimmune: [Passive; 0] = [];
+    let op = helpers::typepasfetch(&stat, &mstat, caster);
+    let optype = op.0;
+    let oppassive = op.1;
+
+    let boulderthrow = helpers::dice(5, salt) as i32;
+
+    for _ in 0..boulderthrow {
+        println!("Threw boulder!")
+    }
+
+    salt = helpers::salt(salt, ogsalt, 1);
+    let dmg = match caster {
+        true => {
+            stat.strength - 2
+        }
+        _ => {
+            mstat.strength - 2
+        }
+    };
+
+    let modifier = match helpers::dice(50, salt) % 2 {
+        0 => {
+            salt = helpers::salt(salt, ogsalt, 1);
+            helpers::dice(5, salt) as i32
+        }
+        _ => {
+            salt = helpers::salt(salt, ogsalt, 1);
+            -(helpers::dice(5, salt) as i32)
+        }
+    };
+    let damage1 = dmg + modifier;
+    let mut damage = damage1 * boulderthrow;
+
+    salt = helpers::salt(salt, ogsalt, 1);
+    let mut status = match helpers::dice(100, salt) % 5 {
+        0 => {
+            Status::Paralyzed
+        }
+        _ => {
+            Status::None
+        }
+    };
+
+    if weakness.contains(&optype) || pweakness.contains(&oppassive) {
+        damage *= 2;
+        status = Status::Paralyzed
+    }
+
+    if resist.contains(&optype) || presist.contains(&oppassive) {
+        damage /= 2;
+    }
+
+    if immune.contains(&optype) || pimmune.contains(&oppassive) {
+        damage = 0;
+        status = Status::None
+    }
+
+    return (damage, status, stat, mstat)
+}
+
+pub fn psychic(mut stat: Player, mut mstat: Monster, caster: bool) -> (i32, Status, Player, Monster) {
+    /* 
+        ~ Psychic - Psychic L20
+        - types: weak Normal, Dinosaur, Toxic | resist Dark, Psychic, Metal, Uncanny | immune Zombie
+        - passives: weak Bipolar | resist Regular, Stoic    
+    */
+
+    let mut ogsalt = 11400714819323198485;
+    let mut salt = 11400714819323198485;
+    let weakness = [Type::Normal, Type::Dinosaur, Type::Toxic];
+    let resist = [Type::Dark, Type::Psychic, Type::Metal, Type::Uncanny];
+    let immune = [Type::Zombie];
+    let pweakness = [Passive::Bipolar];
+    let presist = [Passive::Regular, Passive::Stoic];
+    let pimmune = [];
+    let op = helpers::typepasfetch(&stat, &mstat, caster);
+    let optype = op.0;
+    let oppassive = op.1;
+
+    let dmg = match caster {
+        true => {
+            (stat.intelligence * 2)
+        }
+        _ => {
+            (mstat.intelligence * 2)
+        }
+    };
+
+    let modifier = match helpers::dice(50, salt) % 2 {
+        0 => {
+            salt = helpers::salt(salt, ogsalt, 1);
+            helpers::dice(4, salt) as i32
+        }
+        _ => {
+            salt = helpers::salt(salt, ogsalt, 1);
+            -(helpers::dice(4, salt) as i32)
+        }
+    };
+
+    salt = helpers::salt(salt, ogsalt, 1);
+    let mut status = match helpers::dice(100, salt) % 20 {
+        0..=1 => {
+            Status::Confused
+        }
+        2 => {
+            Status::Schizophrenic
+        }
+        _ => {
+            Status::None
+        }
+    };
+
+    let mut damage = dmg+modifier;
+
+    if weakness.contains(&optype) || pweakness.contains(&oppassive) {
+        salt = helpers::salt(salt, ogsalt, 1);
+        match helpers::dice(50, salt) % 2 {
+            0 => {
+                status = Status::Confused;
+            }
+            _ => {
+                damage *= 2;
+            }
+        };
+    }
+
+    if resist.contains(&optype) || presist.contains(&oppassive) {
+        damage /= 2;
+    }
+
+    if immune.contains(&optype) || pimmune.contains(&oppassive) {
+        damage = 0;
+        status = Status::None;
+    }
+
+    return (damage, status, stat, mstat)
+}
+
+pub fn ultimatum(mut stat: Player, mut mstat: Monster, caster: bool) -> (i32, Status, Player, Monster) {
+    let mut ogsalt = 11400714819323198485;
+    let mut salt = 11400714819323198485;
+    let weakness = [Type::Zombie, Type::Dark, Type::Ghost, Type::Unholy, Type::Chaotic, Type::Uncanny];
+    let resist = [Type::Light, Type::Divine, Type::Holy];
+    let immune = [];
+    let pweakness = [];
+    let presist = [Passive::Regular];
+    let pimmune = [Passive::Sturdy];
+    let op = helpers::typepasfetch(&stat, &mstat, caster);
+    let optype = op.0;
+    let oppassive = op.1;
+
+
+}
+
+pub fn judgement(mut stat: Player, mut mstat: Monster, caster: bool) -> (i32, Status, Player, Monster) {
+    /* 
+        ~ Judgement - Paladin L20
+        - types: weak Zombie, Dark, Ghost, Unholy, Chaotic, Uncanny | resist Light, Divine, Holy
+        - passives: resist Regular
+    */
+
+    let mut ogsalt = 11400714819323198485;
+    let mut salt = 11400714819323198485;
+    let weakness = [Type::Unholy, Type::Chaotic, Type::Uncanny];
+    let mweakness = [Type::Zombie, Type::Dark, Type::Ghost];
+    let resist = [Type::Light, Type::Divine, Type::Holy];
+    let immune = [];
+    let pweakness = [];
+    let presist = [Passive::Regular];
+    let pimmune = [Passive::Counter];
+    let op = helpers::typepasfetch(&stat, &mstat, caster);
+    let optype = op.0;
+    let oppassive = op.1;
+
+    let mut damage = match caster {
+        true => {
+            stat.level * 2
+        }
+        _ => {
+            mstat.level * 2
+        }
+    };
+
+    if weakness.contains(&optype) || pweakness.contains(&oppassive) {
+        damage *= 3
+    }
+
+    if mweakness.contains(&optype) {
+        damage *= 2
+    }
+
+    if presist.contains(&oppassive) || resist.contains(&optype) {
+        damage /= 2
+    }
+
+    if immune.contains(&optype) || pimmune.contains(&oppassive) {
+        damage = 0
+    }
+
+    return (damage, Status::None, stat, mstat)
+}
+
+pub fn arcanoid(mut stat: Player, mut mstat: Monster, caster: bool) -> (i32, Status, Player, Monster) {
+    let mut ogsalt = 11400714819323198485;
+    let mut salt = 11400714819323198485;
+    let weakness = [Type::Zombie, Type::Dark, Type::Ghost, Type::Unholy, Type::Chaotic, Type::Uncanny];
+    let resist = [Type::Light, Type::Divine, Type::Holy];
+    let immune = [];
+    let pweakness = [];
+    let presist = [Passive::Regular];
+    let pimmune = [Passive::Sturdy];
+    let op = helpers::typepasfetch(&stat, &mstat, caster);
+    let optype = op.0;
+    let oppassive = op.1;
+}
+
+pub fn greenbullet(mut stat: Player, mut mstat: Monster, caster: bool) -> (i32, Status, Player, Monster) {
+    /*
+        ~ Green Bullet - Rogue L20
+        - types: weak Dragon, Dinosaur, Bird, Plant | resist Zombie, Earth, Metal | immune Ghost
+        - passives: none 
+    */
+
+    let mut ogsalt = 11400714819323198485;
+    let mut salt = 11400714819323198485;
+    let weakness = [Type::Dragon, Type::Dinosaur, Type::Bird, Type::Plant];
+    let resist = [Type::Zombie, Type::Earth, Type::Metal];
+    let immune = [Type::Ghost];
+    let pweakness = [];
+    let presist = [];
+    let pimmune = [];
+    let plstatuses = [Status::Confused, Status::Schizophrenic, Status::Paralyzed];
+    let op = helpers::typepasfetch(&stat, &mstat, caster);
+    let optype = op.0;
+    let oppassive = op.1;
+
+    let modifier = match helpers::dice(50, salt) % 2 {
+        0 => {
+            salt = helpers::salt(salt, ogsalt, 1);
+            helpers::dice(4, salt) as i32
+        }
+        _ => {
+            salt = helpers::salt(salt, ogsalt, 1);
+            -(helpers::dice(4, salt) as i32)
+        }
+    };
+
+    let mut dmg = match caster {
+        true => {
+            (stat.dexterity * 2) + modifier
+        }
+        _ => {
+            (mstat.dexterity * 2) + modifier
+        }
+    };
+
+    let plstatus = match caster {
+        true => {
+            stat.status
+        }
+        _ => {
+            mstat.status
+        }
+    };
+
+    let opstatus = match !caster {
+        true => {
+            stat.status
+        }
+        _ => {
+            mstat.status
+        }
+    };
+
+    if plstatuses.contains(&plstatus) {
+        dmg /= 2;
+    }
+
+    if plstatuses.contains(&opstatus) {
+        dmg *= 2;
+    }
+
+    salt = helpers::salt(salt, ogsalt, 1);
+    match helpers::dice(50, salt) % 5 {
+        0 => {
+            match caster {
+                true => {
+                    mstat.money /= 2;
+                    stat.money *= 2;
+                }
+                _ => {
+                    stat.money /= 2;
+                    mstat.money *= 2;
+                }
+            }
+        }
+        _ => {
+            
         }
     }
 
-    return ((damage/2) as i32, Status::None, stat, mstat)
+    salt = helpers::salt(salt, ogsalt, 1);
+    let status = match helpers::dice(50, salt) % 5 {
+        0 => {
+            match caster {
+                true => {
+                    if oppassive != Passive::Stoic {
+                        Status::Confused
+                    }
+                    else {
+                        Status::None
+                    }
+                }
+                _ => {
+                    if stat.passive != Passive::Stoic {
+                        Status::Confused
+                    }
+                    else {
+                        Status::None
+                    }
+                }
+            }
+        }
+        _ => {
+            Status::None
+        }
+    };
+
+    if weakness.contains(&optype) || pweakness.contains(&oppassive) {
+        dmg *= 2;
+    }
+
+    if resist.contains(&optype) || presist.contains(&oppassive) {
+        dmg /= 2;
+    }
+
+    if immune.contains(&optype) || pimmune.contains(&oppassive) {
+        dmg = 0;
+    }
+
+    return (dmg, status, stat, mstat)
 }

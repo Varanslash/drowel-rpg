@@ -476,5 +476,6 @@ pub enum Passive {
     MultiattackII, // get 2 turns per turn, uses Channel 8
     MultiattackIII, // get 2 turns per turn, uses Channel 8
     Divinity, // For those without Divine, it turns you to a Divine type if triggered in exchange for 25% of your HP. If you are Divine and have this ability, you will do 1.2x damage every time you attack.
+    Counter, // Not natural. Occurs when passive is modified; can block many magical attacks.
     None
 }

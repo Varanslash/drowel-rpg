@@ -1,5 +1,6 @@
 use std::time::SystemTime;
 use std::time::UNIX_EPOCH;
+use crate::gamedata::*;
 
 pub fn hv() {
     println!("-----START-----");
@@ -29,7 +30,7 @@ pub fn hv() {
 }
 
 pub fn dice(x: u64, s: u64) -> u64 {
-    let numberthing = (SystemTime::now().duration_since(UNIX_EPOCH).expect("Time went backwards").as_micros() as u64).wrapping_mul(s);
+    let numberthing = (SystemTime::now().duration_since(UNIX_EPOCH).expect("Time went backwards").as_nanos() as u64).wrapping_mul(s);
 
     let mut z = numberthing.wrapping_mul(s);
     z ^= z >> 30;
@@ -52,4 +53,26 @@ pub fn salt(s: u64, ogs: u64, rounds: u32) -> u64 {
     }
     
     return z;
+}
+
+pub fn typepasfetch(stat: &Player, mstat: &Monster, caster: bool) -> (Type, Passive) {
+    let optype = match !caster {
+        true => {
+            stat.ptype
+        }
+        _ => {
+            mstat.mtype
+        }
+    };
+
+    let oppassive = match !caster {
+        true => {
+            stat.passive
+        }
+        _ => {
+            mstat.passive
+        }
+    };
+
+    return (optype, oppassive)
 }

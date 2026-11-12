@@ -260,3 +260,10 @@ attacks:
 - Sunder
 - Daze
 + NaNAttack
+
+types/tiers of attacks
+- holistic
+- carmine
+- butterfly
+- minus
+- glass
